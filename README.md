@@ -1,8 +1,28 @@
 # Auto Classification Generator Tool
 
-This tool is utilised to recusrively generater classification codes, following an ISAD(G) convention, for a given directory / folder to an Excel or CSV spreadsheet.
 
 It is compatible with Windows, MacOS and Linux operating systems (though testing has been limited on MacOS).
+
+## What does this tool do?
+
+This tool will recusrively generater classification codes, following an ISAD(G) convention, for a given directory / folder to an Excel or CSV spreadsheet.
+
+## Why use this tool?
+
+If you're an archivist dealing with Digital Records, this provides a means of undertaking a classification of hundreds and and thousands of records, saving a significant amount of time on large projects. This tool can also be hooked into python scripts, see my other Opex Manifest Generator project.
+
+## Additional features:
+
+- Appendable prefix.
+- Changable starting reference.
+- Logged removal of empty directories.
+- Alternative "accession reference" mode.
+- Compatiable with Win32 / 256 Character Limit.
+
+## Why not use this tool
+
+The classification will generate an archival reference code for each file, down to item level. If you're institution does not classify Digital records down to item level, this is not a suitable tool for you. At the moment, the program cannot group together higher levels. To note there can extraneously long classification codes, depending on the depth of the folders.
+
 
 ## Sturcture of References
 
