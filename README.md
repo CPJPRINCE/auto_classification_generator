@@ -24,7 +24,7 @@ If you're an archivist dealing with Digital Records, this provides a means of un
 The classification will generate an archival reference code for each file, down to item level. If you're institution does not classify Digital records down to item level, this is not a suitable tool for you. At the moment, the program cannot group together higher levels. To note there can extraneously long classification codes, depending on the depth of the folders.
 
 ## Sturcture of References
-
+```
 Folder                  Reference
 -->Root                 0
 ---->Folder 1           0/1
@@ -36,17 +36,15 @@ Folder                  Reference
 -------->File 4         0/1/2/2
 ---->Folder 2           0/2
 ------>Sub Folder 3     0/2/1
+```
+The root reference defaults to 0, however this the Prefix option can be utilised to change 0 to the desired prefix / archival reference, changing the structure to:
 
-The root reference defaults to 0, however this the Prefix option can be utilised to change 0 to the desired prefix / archival reference: 
-
---prefix "ARC"
-
-Changes:
-
+```
 -->Root Folder          ARC
 ---->Folder             ARC/1
 ------>Sub Folder       ARC/1/1
 etc
+```
 
 ## Prerequisites
 
