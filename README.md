@@ -23,7 +23,6 @@ If you're an archivist dealing with Digital Records, this provides a means of un
 
 The classification will generate an archival reference code for each file, down to item level. If you're institution does not classify Digital records down to item level, this is not a suitable tool for you. At the moment, the program cannot group together higher levels. To note there can extraneously long classification codes, depending on the depth of the folders.
 
-
 ## Sturcture of References
 
 Folder                  Reference
@@ -75,7 +74,7 @@ Replacing the path with your folder. If a space is in the path enclose in quoati
 
 To run the program with the Prefix options enabled:
 
-`auto_classification_generator "C:\Users\Christopher\Downloads\"` -p "MyDownloads"
+`auto_classification_generator "C:\Users\Christopher\Downloads\" -p "MyDownloads"`
 
 ## Options:
 
@@ -83,13 +82,26 @@ The following options are currently avilable to run the program with:
 
 ```
 Options:
-        -h,     --help          Show Help dialog
-        -p,     --prefix        Replace Root 0 with specified prefix    [string]
-        -acc,   -accession      Run in "Accession Mode", this will generate a running number of either Files, Directories or Both {None,Dir,File,All}
-        -accp,  --acc-prefix    Set the Prefix to append onto the running number generated in "Accession Mode"
-        -s,     --start-ref     Set the Reference to start from.        [int]
-        -o,     --output        Set the directory to export      
-        -m,     --meta-dir      Set whether to generate a "meta" directory, to export CSV / Excel file to. Default behaviour will be to create a directory, using this option will disable it.         [boolean]
-        --skip                  Skip running the Auto Classification process, will generate a spreadsheet but not an Archival Reference [boolean]
-        -fmt,   --format        Set whether to export as a CSV or XLSX file.
+        -h,     --help          Show Help dialog                              
+        -p,     --prefix        Replace Root 0 with specified prefix            [string]
+        -acc,   -accession      Run in "Accession Mode", this will              {None,Dir,File,All}           
+                                generate a running number of either Files, 
+                                Directories or Both {None,Dir,File,All}
+        -accp,  --acc-prefix    Set the Prefix to append onto the running       [boolean]
+                                number generated in "Accession Mode"
+        -rm     --empty         Will remove all Empty Directories from          [boolean]
+                                within a given folder, disincluding them
+                                in the Reference Generation.
+        -s,     --start-ref     Set the number to start the Reference           [int] 
+                                generation from.
+        -o,     --output        Set the directory to export the spreadsheet to. [string]      
+        -m,     --meta-dir      Set whether to generate a "meta" directory,     [boolean]
+                                to export CSV / Excel file to.
+                                Default behaviour will be to create a directory,
+                                 using this option will disable it.      
+        --skip                  Skip running the Auto Classification process,   [boolean]
+                                will generate a spreadsheet but not
+                                an Archival Reference
+        -fmt,   --format        Set whether to export as a CSV or XLSX file.    {csv,xlsx}
+                                Otherwise defualts to xlsx.
 ```
