@@ -1,0 +1,2 @@
+[console_scripts]
+auto_class = auto_classification_generator.classification_generator:cli

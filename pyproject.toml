@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "auto_classification_generator"
+version = "2.0.2"
+authors = [
+    {name="Christopher Prince", email="c.pj.prince@gmail.com"}
+    ]
+description = "Auto Classificaiton Generator Tool for Archivists"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Apache Software License",
+    "Operating System :: OS Independent",
+    "Topic :: System :: Archiving"
+    ]
+dependencies=["pandas","openpyxl"]
+[project.urls]
+Homepage = "https://github.com/CPJPRINCE/auto_classification_generator"
+Issues = "https://github.com/CPJPRINCE/auto_classification_generator/issues"
+[project.scripts]
+auto_class = "auto_classification_generator.classification_generator:cli"
