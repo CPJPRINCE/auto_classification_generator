@@ -1,27 +1,34 @@
 # Auto Classification Generator Tool
 
+The Auto-classification tool is small python programme to help Digital archivists classify and catalogue Digital Items. It recursively acts through a given directory to create generating an ISAD(G) classification code for each directory and file, then exporting the results to an Excel or CSV spreadsheet.
 
-It is compatible with Windows, MacOS and Linux operating systems (though testing has been limited on MacOS).
-
-## What does this tool do?
-
-This tool will recusrively generater classification codes, following an ISAD(G) convention, for a given directory / folder to an Excel or CSV spreadsheet.
+It's platform independent tested functioning on Windows, MacOS and Linux. 
 
 ## Why use this tool?
 
-If you're an archivist dealing with Digital Records, this provides a means of undertaking a classification of hundreds and and thousands of records, saving a significant amount of time on large projects. This tool can also be hooked into python scripts, see my other Opex Manifest Generator project.
+If you're an archivist dealing with Digital Records, this provides a means of undertaking a classification of hundreds and and thousands of records, saving a significant amount of time on when dealing with large amounts of records.
+
+Arrangement can be done before generation of the spreadsheet.
+
+For developer's, this tool can also be hooked into python scripts.
 
 ## Additional features:
 
-- Appendable prefix.
+Some additional features include.
+
+- Appendable prefixes to the Archival Reference.
+- Identifing the depth of each folder.
+- Gathering standard set of Metadata.
 - Changable starting reference.
 - Logged removal of empty directories.
-- Alternative "accession reference" mode.
-- Compatiable with Win32 / 256 Character Limit.
+- An alternative "Accession Reference" mode.
+- Compatiablility with Win32 / Window's 256 Character limit.
 
-## Why not use this tool
+## Why not use this tool?
 
-The classification will generate an archival reference code for each file, down to item level. If you're institution does not classify Digital records down to item level, this is not a suitable tool for you. At the moment, the program cannot group together higher levels. To note there can extraneously long classification codes, depending on the depth of the folders.
+The classification will generate an archival reference code for each file, down to item level. If you're institution does not classify Digital records down to item level, this is not a suitable tool for you. At the moment, the program cannot group together higher levels. There can also extraneously long classification codes, depending on the depth of the folders.
+
+This tool might still be of be helpful as it can identify the depth of the folders. Alternatively the spreadsheet's template is also the basis of the template used in my "Opex Manifest Generator" tool *\*Shameless Self promotion\**.
 
 ## Sturcture of References
 ```
@@ -56,23 +63,24 @@ Python Version 3.8+ is also recommended. It may work on earlier versions, but th
 
 ## Installation
 
-To install simply run:
+To install, simply run:
 
-`pip install auto_classification_generator`
+`pip install -U auto_classification_generator`
 
 ## Usage
 
 To run the basic program, run from the terminal:
 
-`auto_classification_generator {path/to/your/folder}`
+`auto_class {path/to/your/folder}`
 
 Replacing the path with your folder. If a space is in the path enclose in quoations. On Windows this may look like:
 
-`auto_classification_generator "C:\Users\Christopher\Downloads\"`
+`auto_class "C:\Users\Christopher\Downloads\"`
 
-To run the program with the Prefix options enabled:
+Additional options can be appended before or after the root directory is given. For instance, to run the program with the Prefix set to "MyDownloads", you can run:
 
-`auto_classification_generator "C:\Users\Christopher\Downloads\" -p "MyDownloads"`
+`auto_class "C:\Users\Christopher\Downloads\" -p "MyDownloads"`
+
 
 ## Options:
 
@@ -90,16 +98,27 @@ Options:
         -rm     --empty         Will remove all Empty Directories from          [boolean]
                                 within a given folder, disincluding them
                                 in the Reference Generation.
+                                A simply Text list of removed folders is 
+                                then generated to the output directory.
         -s,     --start-ref     Set the number to start the Reference           [int] 
                                 generation from.
         -o,     --output        Set the directory to export the spreadsheet to. [string]      
         -m,     --meta-dir      Set whether to generate a "meta" directory,     [boolean]
                                 to export CSV / Excel file to.
                                 Default behaviour will be to create a directory,
-                                 using this option will disable it.      
-        --skip                  Skip running the Auto Classification process,   [boolean]
+                                using this option will disable it.      
+                --skip          Skip running the Auto Classification process,   [boolean]
                                 will generate a spreadsheet but not
                                 an Archival Reference
         -fmt,   --format        Set whether to export as a CSV or XLSX file.    {csv,xlsx}
                                 Otherwise defualts to xlsx.
 ```
+
+## Future Developments
+
+- Level Limitations to allow for "group references".
+- Generating reference's which combine numericals with alphabeticals...
+
+## Contributing
+
+I welcome further contributions and feedback.

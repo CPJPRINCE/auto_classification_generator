@@ -9,8 +9,6 @@ import os
 import time
 import pandas as pd
 
-import auto_classification_generator
-
 def path_check(path):
     if os.path.exists(path):
         pass

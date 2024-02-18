@@ -9,5 +9,5 @@ from .common import *
 from .classification_generator import ClassificationGenerator
 
 __author__ = "Christopher Prince (c.pj.prince@gmail.com)"
-__version__ = "2.0"
+__version__ = "2.0.1"
 __license__ = "Apache License Version 2.0"
