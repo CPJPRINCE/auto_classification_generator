@@ -34,15 +34,15 @@ This tool might still be of be helpful as it can identify the depth of the folde
 ```
 Folder                  Reference
 -->Root                 0
----->Folder 1           0/1
------->Sub Folder 1     0/1/1
--------->File 1         0/1/1/1
--------->File 2         0/1/1/2
------->Sub Folder 2     0/1/2
--------->File 3         0/1/2/1
--------->File 4         0/1/2/2
----->Folder 2           0/2
------->Sub Folder 3     0/2/1
+---->Folder 1           1
+------>Sub Folder 1     1/1
+-------->File 1         1/1/1
+-------->File 2         1/1/2
+------>Sub Folder 2     1/2
+-------->File 3         1/2/1
+-------->File 4         1/2/2
+---->Folder 2           2
+------>Sub Folder 3     2/1
 ```
 The root reference defaults to 0, however this the Prefix option can be utilised to change 0 to the desired prefix / archival reference, changing the structure to:
 
