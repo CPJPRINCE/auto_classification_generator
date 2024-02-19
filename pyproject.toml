@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "auto_classification_generator"
-version = "2.0.2"
+version = "1.0.0"
 authors = [
     {name="Christopher Prince", email="c.pj.prince@gmail.com"}
     ]
@@ -20,4 +20,4 @@ dependencies=["pandas","openpyxl"]
 Homepage = "https://github.com/CPJPRINCE/auto_classification_generator"
 Issues = "https://github.com/CPJPRINCE/auto_classification_generator/issues"
 [project.scripts]
-auto_class = "auto_classification_generator.classification_generator:cli"
+auto_class = "auto_classification_generator.cli:run_cli"
