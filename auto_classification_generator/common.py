@@ -8,6 +8,7 @@ license: Apache License 2.0"
 import os
 import time
 import pandas as pd
+import sys
 
 def path_check(path):
     if os.path.exists(path):
@@ -58,3 +59,9 @@ def export_xl(df,output_filename):
         export_xl(df,output_filename)
     finally:
         print(f"Saved to: {output_filename}")
+
+def win_256_check(path: str):
+    if len(path) > 255 and sys.platform == "win32":
+        if path.startswith(u'\\\\?\\'): path = path
+        else: path = u"\\\\?\\" + path
+    return path

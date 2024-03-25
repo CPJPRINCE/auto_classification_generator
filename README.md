@@ -16,13 +16,13 @@ For developer's, this tool can also be hooked into python scripts.
 
 Some additional features include.
 
-- Appendable prefixes to the Archival Reference.
-- Identifing the depth of each folder.
+- Append prefixes to the Archival Reference.
+- Identifying the depth of each folder.
 - Gathering standard set of Metadata.
-- Changable starting reference.
+- Changeable starting reference.
 - Logged removal of empty directories.
 - An alternative "Accession Reference" mode.
-- Compatiablility with Win32 / Window's 256 Character limit.
+- Compatibility with Win32 / Window's 256 Character limit.
 
 ## Why not use this tool?
 
@@ -30,7 +30,7 @@ The classification will generate an archival reference code for each file, down 
 
 This tool might still be of be helpful as it can identify the depth of the folders. Alternatively the spreadsheet's template is also the basis of the template used in my "Opex Manifest Generator" tool *\*Shameless Self promotion\**.
 
-## Sturcture of References
+## Structure of References
 ```
 Folder                  Reference
 -->Root                 0
@@ -44,7 +44,7 @@ Folder                  Reference
 ---->Folder 2           2
 ------>Sub Folder 3     2/1
 ```
-The root reference defaults to 0, however this the Prefix option can be utilised to change 0 to the desired prefix / archival reference, changing the structure to:
+The root reference defaults to 0, however this the Prefix option can be utilized to change 0 to the desired prefix / archival reference, changing the structure to:
 
 ```
 -->Root Folder          ARC
@@ -55,7 +55,7 @@ etc
 
 ## Prerequisites
 
-The following modules are utilised and installed with the package:
+The following modules are utilized and installed with the package:
 - pandas
 - openpyxl
 
@@ -73,7 +73,7 @@ To run the basic program, run from the terminal:
 
 `auto_class {path/to/your/folder}`
 
-Replacing the path with your folder. If a space is in the path enclose in quoations. On Windows this may look like:
+Replacing the path with your folder. If a space is in the path enclose in quotations. On Windows this may look like:
 
 `auto_class "C:\Users\Christopher\Downloads\"`
 
@@ -84,7 +84,7 @@ Additional options can be appended before or after the root directory is given. 
 
 ## Options:
 
-The following options are currently avilable to run the program with:
+The following options are currently available to run the program with:
 
 ```
 Options:
@@ -96,7 +96,7 @@ Options:
         -accp,  --acc-prefix    Set the Prefix to append onto the running       [boolean]
                                 number generated in "Accession Mode"
         -rm     --empty         Will remove all Empty Directories from          [boolean]
-                                within a given folder, disincluding them
+                                within a given folder, not including them
                                 in the Reference Generation.
                                 A simply Text list of removed folders is 
                                 then generated to the output directory.
@@ -105,19 +105,19 @@ Options:
         -o,     --output        Set the directory to export the spreadsheet to. [string]      
         -m,     --meta-dir      Set whether to generate a "meta" directory,     [boolean]
                                 to export CSV / Excel file to.
-                                Default behaviour will be to create a directory,
+                                Default behavior will be to create a directory,
                                 using this option will disable it.      
                 --skip          Skip running the Auto Classification process,   [boolean]
                                 will generate a spreadsheet but not
                                 an Archival Reference
         -fmt,   --format        Set whether to export as a CSV or XLSX file.    {csv,xlsx}
-                                Otherwise defualts to xlsx.
+                                Otherwise defaults to xlsx.
 ```
 
 ## Future Developments
 
 - Level Limitations to allow for "group references".
-- Generating reference's which combine numericals with alphabeticals...
+- Generating reference's which use alphabetic characters...
 
 ## Contributing
 
