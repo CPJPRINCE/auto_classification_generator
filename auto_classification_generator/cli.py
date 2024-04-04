@@ -12,9 +12,11 @@ def parse_args():
     parser.add_argument("-acc","--accession",required=False,choices=['None','Dir','File','All'],default=None)
     parser.add_argument("-o","--output",required=False,nargs='?')
     parser.add_argument("-s","--start-ref",required=False,nargs='?',default=1)
-    parser.add_argument("-m","--meta-dir",required=False,action='store_true',default=True)
+    parser.add_argument("--meta-dir",required=False,action='store_true',default=True)
     parser.add_argument("--skip",required=False,action='store_true',default=False)
+    parser.add_argument("--hidden",required=False,action='store_true',default=False)
     parser.add_argument("-fmt","--output-format",required=False,default="xlsx",choices=['xlsx','csv'])
+    parser.add_argument("-fx","--fixity",required=False,default="SHA-1",choices=['MD5','SHA-1','SHA-256','SHA-512'])
     parser.add_argument("-v", "--version", action='version',version='%(prog)s {version}'.format(version=__version__))
     args = parser.parse_args()
     return args
@@ -28,16 +30,15 @@ def run_cli():
     else:
         args.output = os.path.abspath(args.output)
         print(f'Output path set to: {args.output}')
-    if args.version:
-        print(__version__)
-        raise SystemExit()
     
     ClassificationGenerator(args.root,
-                            output_path=args.output,
+                            output_path = args.output,
                             prefix=args.prefix,
                             accprefix=args.acc_prefix,
+                            fixity=args.fixity,
                             empty_flag=args.empty,
                             accession_flag=args.accession,
+                            hidden_flag=args.hidden,
                             start_ref=args.start_ref,
                             meta_dir_flag=args.meta_dir,
                             skip_flag=args.skip,
