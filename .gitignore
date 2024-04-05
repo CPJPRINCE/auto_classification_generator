@@ -2,3 +2,4 @@ __pycache__
 dist/
 .venv
 .vscode
+auto_classification_generator.egg-info
