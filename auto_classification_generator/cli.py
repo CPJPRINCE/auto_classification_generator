@@ -26,7 +26,7 @@ def run_cli():
     if isinstance(args.root,str): args.root = args.root.strip("\"").rstrip("\\")
     if not args.output:
         args.output = os.path.abspath(args.root)
-        print(f'No output path selected, defaulting to root Directory: {args.output}')
+        print(f'Output path defaulting to root directory: {args.output}')
     else:
         args.output = os.path.abspath(args.output)
         print(f'Output path set to: {args.output}')

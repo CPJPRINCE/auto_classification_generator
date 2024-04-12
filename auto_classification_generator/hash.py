@@ -25,5 +25,4 @@ class HashGenerator():
             while buff:
                 hash.update(buff)
                 buff = f.read(self.buffer)
-        print(hash.hexdigest())
         return hash.hexdigest().upper()

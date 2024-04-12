@@ -43,6 +43,8 @@ Folder                  Reference
 -------->File 4         1/2/2
 ---->Folder 2           2
 ------>Sub Folder 3     2/1
+------>File 5           2/2
+---->File 6             3
 ```
 The root reference defaults to 0, however this the Prefix option can be utilized to change 0 to the desired prefix / archival reference, changing the structure to:
 
@@ -50,6 +52,7 @@ The root reference defaults to 0, however this the Prefix option can be utilized
 -->Root Folder          ARC
 ---->Folder             ARC/1
 ------>Sub Folder       ARC/1/1
+------>File             ARC/1/2
 etc
 ```
 
