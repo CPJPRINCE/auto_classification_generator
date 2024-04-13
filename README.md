@@ -1,34 +1,30 @@
 # Auto Classification Generator Tool
 
-The Auto-classification tool is small python programme to help Digital archivists classify and catalogue Digital Items. It recursively acts through a given directory to create generating an ISAD(G) classification code for each directory and file, then exporting the results to an Excel or CSV spreadsheet.
+The Auto-classification tool is small python programme to help Digital archivists classify and catalogue Digital Items. It recursively acts through a given directory to create generating reference codes for each directory and file, then exporting the results to an Excel or CSV spreadsheet.
 
 It's platform independent tested functioning on Windows, MacOS and Linux. 
 
 ## Why use this tool?
 
-If you're an archivist dealing with Digital Records, this provides a means of undertaking a classification of hundreds and and thousands of records, saving a significant amount of time on when dealing with large amounts of records.
+If you're an archivist dealing with Digital Records, this provides a means of undertaking a classification of numerous records at a time, saving a significant amount of time in assigning reference codes to individual records.
 
-Arrangement can be done before generation of the spreadsheet.
+The generated spreadsheet also serves as the basis for spreadsheet inputs for the Opex Manifest Generator tool [*\*Shameless Self promotion\**.](https://github.com/CPJPRINCE/opex_manifest_generator/)
 
-For developer's, this tool can also be hooked into python scripts.
+## A Quick Note
+
+If you need to conduct an arrangement of the files; this must be done beforehand for the references to be accurate; though a temporary spreadsheet can be generated to provide assistance in this.
 
 ## Additional features:
 
 Some additional features include.
 
 - Append prefixes to the Archival Reference.
-- Identifying the depth of each folder.
+- Identifying the depth / level of each folder.
 - Gathering standard set of Metadata.
 - Changeable starting reference.
 - Logged removal of empty directories.
 - An alternative "Accession Reference" mode.
 - Compatibility with Win32 / Window's 256 Character limit.
-
-## Why not use this tool?
-
-The classification will generate an archival reference code for each file, down to item level. If you're institution does not classify Digital records down to item level, this is not a suitable tool for you. At the moment, the program cannot group together higher levels. There can also extraneously long classification codes, depending on the depth of the folders.
-
-This tool might still be of be helpful as it can identify the depth of the folders. Alternatively the spreadsheet's template is also the basis of the template used in my Opex Manifest Generator tool [*\*Shameless Self promotion\**.](https://github.com/CPJPRINCE/opex_manifest_generator/)
 
 ## Structure of References
 ```
@@ -153,13 +149,11 @@ To run a SHA-512 generation:
 
 ## Filtering
 
-By default hidden folders and folders named 'meta' will be ignored.
-
-You can enable hidden folders using `--hidden`
+By default hidden folders and folders named 'meta' will be ignored. You can include hidden folders by using the option `--hidden`
 
 ## Skip
 
-If you just want to generate a spreadsheet without a reference code you can add `--skip`.
+If you just want to generate a spreadsheet without a reference code you can add `--skip`, and it will gsimply generate a spreadsheet without the Archive_Reference
 
 ## Options:
 
