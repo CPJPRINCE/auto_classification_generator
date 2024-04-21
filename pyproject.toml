@@ -21,3 +21,8 @@ Homepage = "https://github.com/CPJPRINCE/auto_classification_generator"
 Issues = "https://github.com/CPJPRINCE/auto_classification_generator/issues"
 [project.scripts]
 auto_class = "auto_classification_generator.cli:run_cli"
+
+[tool.setuptools.packages.find]
+where = ['.']
+include = ['auto_classification_generator']
+exclude = []
