@@ -1,7 +1,7 @@
 from auto_classification_generator.classification_generator import ClassificationGenerator
-from auto_classification_generator.version import __version__
 import argparse
 import os
+import importlib.metadata
 
 def parse_args():
     parser = argparse.ArgumentParser(description="OPEX Manifest Generator for Preservica Uploads")
@@ -17,7 +17,7 @@ def parse_args():
     parser.add_argument("--hidden",required=False,action='store_true',default=False)
     parser.add_argument("-fmt","--output-format",required=False,default="xlsx",choices=['xlsx','csv'])
     parser.add_argument("-fx","--fixity",required=False,nargs='?', const="SHA-1",default=None,choices=['NONE','MD5','SHA-1','SHA-256','SHA-512'],type=str.upper)
-    parser.add_argument("-v", "--version", action='version',version='%(prog)s {version}'.format(version=__version__))
+    parser.add_argument("-v", "--version", action='version',version='%(prog)s {version}'.format(version=importlib.metadata.version("auto_classification_generator")))
     args = parser.parse_args()
     return args
 
