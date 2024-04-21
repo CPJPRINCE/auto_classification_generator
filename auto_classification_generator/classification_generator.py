@@ -93,51 +93,64 @@ class ClassificationGenerator():
         """
         Sorts the list alphabetically and filters out certain files.
         """
-        if not self.hidden_flag:
-            list_directories = sorted([f.name for f in os.scandir(directory)
-                                        if not f.name.startswith('.')
-                                        and not bool(os.stat(os.path.join(directory, f.name)).st_file_attributes &
-                                                     stat.FILE_ATTRIBUTE_HIDDEN)
-                                        and not f.name.endswith('.opex')
-                                        and f.name != 'meta'
-                                        and f.name != os.path.basename(__file__)], key=str.casefold)
-        else:
-            list_directories = sorted([f.name for f in os.scandir(directory)
-                                        if not f.name.endswith('.opex')
-                                        and f.name != 'meta'
-                                        and f.name != os.path.basename(__file__)], key=str.casefold)
-        return list_directories
+        try:
+            if not self.hidden_flag:
+                list_directories = sorted([f.name for f in os.scandir(directory)
+                                            if not f.name.startswith('.')
+                                            and not bool(os.stat(win_256_check(os.path.join(directory, f.name))).st_file_attributes &
+                                                        stat.FILE_ATTRIBUTE_HIDDEN)
+                                            and not f.name.endswith('.opex')
+                                            and f.name != 'meta'
+                                            and f.name != os.path.basename(__file__)], key=str.casefold)
+            else:
+                list_directories = sorted([f.name for f in os.scandir(directory)
+                                            if not f.name.endswith('.opex')
+                                            and f.name != 'meta'
+                                            and f.name != os.path.basename(__file__)], key=str.casefold)
+            return list_directories
+        except Exception as e:
+            print('Failed to Filter')
+            print(e)
+            raise SystemError()
 
     def parse_directory_dict(self, file_path: str, level: str, ref: int):
         """
         Parses directory / file data into a dict which is then appended to a list
         """
-        full_path = os.path.abspath(file_path)
-        file_stats = os.stat(file_path)
-        if self.accession_flag:
-            acc_ref = self.accession_running_number(file_path)
-            self.accession_list.append(acc_ref)
-        if os.path.isdir(file_path):
-            file_type = "Dir"
-        else:
-            file_type = "File"
-        class_dict = {'RelativeName': str(file_path).replace(self.root_path, ""),
-                      'FullName': str(full_path),
-                      'Basename': os.path.splitext(os.path.basename(file_path))[0],
-                      'Extension': os.path.splitext(file_path)[1],
-                      'Parent': os.path.abspath(os.path.join(full_path, os.pardir)),
-                      'Attribute': file_type,
-                      'Size': file_stats.st_size,
-                      'CreateDate': datetime.fromtimestamp(file_stats.st_birthtime),
-                      'ModifiedDate': datetime.fromtimestamp(file_stats.st_mtime),
-                      'AccessDate': datetime.fromtimestamp(file_stats.st_atime),
-                      'Level': level,
-                      'Ref_Section': ref}
-        if self.fixity and not os.path.isdir(file_path):
-            hash = HashGenerator(self.fixity).hash_generator(win_256_check(file_path))
-            class_dict.update({"Algorithm": self.fixity, "Hash": hash})
-        self.record_list.append(class_dict)
-        return class_dict
+        try:
+            if file_path.startswith(u'\\\\?\\'):
+                parse_path = file_path.replace(u'\\\\?\\', "")
+            else: 
+                parse_path = file_path
+            file_stats = os.stat(file_path)
+            if self.accession_flag:
+                acc_ref = self.accession_running_number(parse_path)
+                self.accession_list.append(acc_ref)
+            if os.path.isdir(file_path):
+                file_type = "Dir"
+            else:
+                file_type = "File"
+            class_dict = {'RelativeName': str(parse_path).replace(self.root_path, ""),
+                        'FullName': str(os.path.abspath(parse_path)),
+                        'Basename': os.path.splitext(os.path.basename(file_path))[0],
+                        'Extension': os.path.splitext(file_path)[1],
+                        'Parent': os.path.abspath(os.path.join(os.path.abspath(parse_path), os.pardir)),
+                        'Attribute': file_type,
+                        'Size': file_stats.st_size,
+                        'CreateDate': datetime.fromtimestamp(file_stats.st_ctime),
+                        'ModifiedDate': datetime.fromtimestamp(file_stats.st_mtime),
+                        'AccessDate': datetime.fromtimestamp(file_stats.st_atime),
+                        'Level': level,
+                        'Ref_Section': ref}
+            if self.fixity and not os.path.isdir(file_path):
+                hash = HashGenerator(self.fixity).hash_generator(file_path)
+                class_dict.update({"Algorithm": self.fixity, "Hash": hash})
+            self.record_list.append(class_dict)
+            return class_dict
+        except:
+            print('Failed to Parse')
+            raise SystemError()
+
 
     def list_directories(self, directory: str, ref: int = 1):
         """
@@ -151,16 +164,15 @@ class ClassificationGenerator():
             else:
                 level = directory.count(os.sep) - self.root_level + 1
             for file in list_directory:
-                file_path = os.path.join(directory, file)
-                file_path_256 = win_256_check(file_path)
+                file_path = win_256_check(os.path.join(directory, file))
                 self.parse_directory_dict(file_path, level, ref)
                 ref = int(ref) + int(1)
                 if os.path.isdir(file_path):
-                    self.list_directories(file_path_256, ref=1)
+                    self.list_directories(file_path, ref=1)
         except Exception as e:
             print(e)
             print("Error occurred for directory/file: {}".format(list_directory))
-            raise SystemExit()
+            raise SystemError()
             pass
 
     def init_dataframe(self):
