@@ -18,18 +18,18 @@ from datetime import datetime
 import time
 
 class ClassificationGenerator():
-    def __init__(self,
-                 root: str,
-                 output_path: str = os.getcwd(),
-                 prefix: str = None,
-                 accprefix: str = None,
-                 start_ref: int = 1,
-                 fixity: str = None,
-                 empty_flag: bool = False,
-                 skip_flag: bool = False,
-                 accession_flag: bool = False,
-                 meta_dir_flag: bool = True,
-                 hidden_flag: bool = False,
+    def __init__(self, 
+                 root: str, 
+                 output_path: str = os.getcwd(), 
+                 prefix: str = None, 
+                 accprefix: str = None, 
+                 start_ref: int = 1, 
+                 fixity: str = None, 
+                 empty_flag: bool = False, 
+                 skip_flag: bool = False, 
+                 accession_flag: bool = False, 
+                 meta_dir_flag: bool = True, 
+                 hidden_flag: bool = False, 
                  output_format: str = "xlsx"):
 
         self.root = os.path.abspath(root)
@@ -74,7 +74,7 @@ class ClassificationGenerator():
             time.sleep(1)
             raise SystemExit()
         empty_dirs = []
-        for dirpath, dirnames, filenames in os.walk(self.root, topdown=False):
+        for dirpath, dirnames, filenames in os.walk(self.root, topdown = False):
             if not any((dirnames, filenames)):
                 empty_dirs.append(dirpath)
                 try:
@@ -83,8 +83,8 @@ class ClassificationGenerator():
                 except OSError as e:
                     print(f"Error removing directory '{dirpath}': {e}")
         if empty_dirs:
-            output_txt = define_output_file(self.output_path, self.root, self.meta_dir_flag,
-                                            output_suffix="_EmptyDirectoriesRemoved",output_format="txt")
+            output_txt = define_output_file(self.output_path, self.root, self.meta_dir_flag, 
+                                            output_suffix = "_EmptyDirectoriesRemoved", output_format = "txt")
             export_list_txt(empty_dirs, output_txt)
         else:
             print('No directories removed!')
@@ -97,16 +97,15 @@ class ClassificationGenerator():
             if not self.hidden_flag:
                 list_directories = sorted([f.name for f in os.scandir(directory)
                                             if not f.name.startswith('.')
-                                            and not bool(os.stat(win_256_check(os.path.join(directory, f.name))).st_file_attributes &
-                                                        stat.FILE_ATTRIBUTE_HIDDEN)
+                                            and not bool(os.stat(win_256_check(os.path.join(directory, f.name))).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN)
                                             and not f.name.endswith('.opex')
                                             and f.name != 'meta'
-                                            and f.name != os.path.basename(__file__)], key=str.casefold)
+                                            and f.name != os.path.basename(__file__)], key = str.casefold)
             else:
                 list_directories = sorted([f.name for f in os.scandir(directory)
                                             if not f.name.endswith('.opex')
                                             and f.name != 'meta'
-                                            and f.name != os.path.basename(__file__)], key=str.casefold)
+                                            and f.name != os.path.basename(__file__)], key = str.casefold)
             return list_directories
         except Exception as e:
             print('Failed to Filter')
@@ -130,17 +129,17 @@ class ClassificationGenerator():
                 file_type = "Dir"
             else:
                 file_type = "File"
-            class_dict = {'RelativeName': str(parse_path).replace(self.root_path, ""),
-                        'FullName': str(os.path.abspath(parse_path)),
-                        'Basename': os.path.splitext(os.path.basename(file_path))[0],
-                        'Extension': os.path.splitext(file_path)[1],
-                        'Parent': os.path.abspath(os.path.join(os.path.abspath(parse_path), os.pardir)),
-                        'Attribute': file_type,
-                        'Size': file_stats.st_size,
-                        'CreateDate': datetime.fromtimestamp(file_stats.st_ctime),
-                        'ModifiedDate': datetime.fromtimestamp(file_stats.st_mtime),
-                        'AccessDate': datetime.fromtimestamp(file_stats.st_atime),
-                        'Level': level,
+            class_dict = {'RelativeName': str(parse_path).replace(self.root_path, ""), 
+                        'FullName': str(os.path.abspath(parse_path)), 
+                        'Basename': os.path.splitext(os.path.basename(file_path))[0], 
+                        'Extension': os.path.splitext(file_path)[1], 
+                        'Parent': os.path.abspath(os.path.join(os.path.abspath(parse_path), os.pardir)), 
+                        'Attribute': file_type, 
+                        'Size': file_stats.st_size, 
+                        'CreateDate': datetime.fromtimestamp(file_stats.st_ctime), 
+                        'ModifiedDate': datetime.fromtimestamp(file_stats.st_mtime), 
+                        'AccessDate': datetime.fromtimestamp(file_stats.st_atime), 
+                        'Level': level, 
                         'Ref_Section': ref}
             if self.fixity and not os.path.isdir(file_path):
                 hash = HashGenerator(self.fixity).hash_generator(file_path)
@@ -168,7 +167,7 @@ class ClassificationGenerator():
                 self.parse_directory_dict(file_path, level, ref)
                 ref = int(ref) + int(1)
                 if os.path.isdir(file_path):
-                    self.list_directories(file_path, ref=1)
+                    self.list_directories(file_path, ref = 1)
         except Exception as e:
             print(e)
             print("Error occurred for directory/file: {}".format(list_directory))
@@ -183,13 +182,13 @@ class ClassificationGenerator():
         (lookup is based on File Path's), and unnecessary data is dropped.
         Any errors are turned to 0 and the result are based on the reference loop initialisation.
         """
-        self.parse_directory_dict(file_path=self.root, level=0, ref=0)
+        self.parse_directory_dict(file_path = self.root, level = 0, ref = 0)
         self.list_directories(self.root, self.start_ref)
         self.df = pd.DataFrame(self.record_list)
-        self.df = self.df.merge(self.df[['FullName', 'Ref_Section']], how='left', left_on='Parent',
-                                right_on='FullName')
-        self.df = self.df.drop(['FullName_y'], axis=1)
-        self.df = self.df.rename(columns={'Ref_Section_x': 'Ref_Section', 'Ref_Section_y': 'Parent_Ref',
+        self.df = self.df.merge(self.df[['FullName', 'Ref_Section']], how = 'left', left_on = 'Parent', 
+                                right_on = 'FullName')
+        self.df = self.df.drop(['FullName_y'], axis = 1)
+        self.df = self.df.rename(columns = {'Ref_Section_x': 'Ref_Section', 'Ref_Section_y': 'Parent_Ref', 
                                           'FullName_x': 'FullName'})
         self.df['Parent_Ref'] = self.df['Parent_Ref'].fillna(0)
         self.df = self.df.astype({'Parent_Ref': int})
@@ -209,16 +208,16 @@ class ClassificationGenerator():
         tot = len(self.list_loop)
         for REF, PARENT, LEVEL in self.list_loop:
             c += 1
-            print(f"Generating Auto Classification for: {c} / {tot}",end="\r")
+            print(f"Generating Auto Classification for: {c} / {tot}", end = "\r")
             TRACK = 1  
-            self.reference_loop(REF,PARENT,TRACK,LEVEL)
+            self.reference_loop(REF, PARENT, TRACK, LEVEL)
 
         self.df['Archive_Reference'] = self.reference_list
         if self.accession_flag:
             self.df['Accession_Reference'] = self.accession_list
         return self.df
 
-    def reference_loop(self, REF, PARENT, TRACK, LEVEL, NEWREF=None):
+    def reference_loop(self, REF, PARENT, TRACK, LEVEL, NEWREF = None):
         """
         The Reference loop works upwards, running an "index lookup" against the parent folder until it reaches the top.
 
@@ -282,7 +281,7 @@ class ClassificationGenerator():
             print(e)
             pass
 
-    def accession_running_number(self,file_path):
+    def accession_running_number(self, file_path):
         """
         Generates a Running Number / Accession Code, can be set to 3 different "modes", counting Files, Directories or Both
         """
@@ -308,12 +307,13 @@ class ClassificationGenerator():
         """
         Runs Program :)
         """
-        if self.empty_flag: self.remove_empty_directories()
+        if self.empty_flag:
+            self.remove_empty_directories()
         self.init_dataframe()
-        output_file = define_output_file(self.output_path, self.root, meta_dir_flag=self.meta_dir_flag,
-                                         output_format=self.output_format)
+        output_file = define_output_file(self.output_path, self.root, meta_dir_flag = self.meta_dir_flag, 
+                                         output_format = self.output_format)
         if self.output_format == "xlsx":
-            export_xl(df=self.df, output_filename=output_file)
+            export_xl(df = self.df, output_filename = output_file)
         elif self.output_format == "csv":
-            export_csv(df=self.df, output_filename=output_file)
+            export_csv(df = self.df, output_filename = output_file)
         self.print_running_time()
