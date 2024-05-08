@@ -286,20 +286,34 @@ class ClassificationGenerator():
         Generates a Running Number / Accession Code, can be set to 3 different "modes", counting Files, Directories or Both
         """
 
-        if self.accession_flag == "File":
+        if self.accession_flag.lower() == "file":
             if os.path.isdir(file_path):
-                accession_ref = self.accession_prefix + "-Dir"
+                if self.accession_prefix:
+                    accession_ref = self.accession_prefix + "-Dir"
+                else: accession_ref = "Dir"
             else:
-                accession_ref = self.accession_prefix + "-" + str(self.accession_count)
+                if self.accession_prefix:
+                    accession_ref = self.accession_prefix + "-" + str(self.accession_count)
+                else:
+                    accession_ref = self.accession_count
                 self.accession_count += 1
-        elif self.accession_flag == "Dir":
+        elif self.accession_flag.lower() == "dir":
             if os.path.isdir(file_path):
-                accession_ref = self.accession_prefix + "-" + str(self.accession_count)
+                if self.accession_prefix:
+                    accession_ref = self.accession_prefix + "-" + str(self.accession_count)
+                else:
+                    accession_ref = self.accession_count
                 self.accession_count += 1
             else:
-                accession_ref = self.accession_prefix + "-File"
-        elif self.accession_flag == "All":
-            accession_ref = self.accession_prefix + "-" + str(self.accession_count)
+                if self.accession_prefix:
+                    accession_ref = self.accession_prefix + "-File"
+                else:
+                    accession_ref = "File"
+        elif self.accession_flag.lower() == "all":
+            if self.accession_prefix:
+                accession_ref = self.accession_prefix + "-" + str(self.accession_count)
+            else:
+                accession_ref = self.accession_count
             self.accession_count += 1
         return accession_ref
 
