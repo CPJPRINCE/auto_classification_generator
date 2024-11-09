@@ -6,7 +6,6 @@ license: Apache License 2.0"
 """
 
 import hashlib
-from concurrent.futures import ProcessPoolExecutor
 
 class HashGenerator():
     def __init__(self,algorithm="SHA-1"):

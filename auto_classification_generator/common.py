@@ -5,10 +5,8 @@ author: Christopher Prince
 license: Apache License 2.0"
 """
 
-import os
-import time
+import os, time, sys, stat
 import pandas as pd
-import sys
 
 def path_check(path: str):
     if os.path.exists(path):
@@ -69,3 +67,12 @@ def win_256_check(path: str):
         else:
             path = u"\\\\?\\" + path
     return path
+
+def filter_win_hidden(path: str):
+    try:
+        if bool(os.stat(path).st_file_attribute & stat.FILE_ATTRIBUTE_HIDDEN) is True:
+            return True
+        else:
+            return False
+    except:
+        return False

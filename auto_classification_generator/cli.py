@@ -1,6 +1,5 @@
 from auto_classification_generator.classification_generator import ClassificationGenerator
-import argparse
-import os
+import argparse, os
 import importlib.metadata
 
 def parse_args():
@@ -45,3 +44,6 @@ def run_cli():
                             skip_flag = args.skip, 
                             output_format = args.output_format).main()
     print('Complete!')
+
+if __name__ == "__main__":
+    run_cli()

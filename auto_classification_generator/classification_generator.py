@@ -11,11 +11,8 @@ license: Apache License 2.0"
 
 from auto_classification_generator.common import *
 from auto_classification_generator.hash import *
-import os
-import stat
+import os, time, datetime
 import pandas as pd
-from datetime import datetime
-import time
 
 class ClassificationGenerator():
     def __init__(self, 
@@ -54,10 +51,10 @@ class ClassificationGenerator():
             self.accession_prefix = prefix
         self.empty_list = []
         self.meta_dir_flag = meta_dir_flag
-        self.start_time = datetime.now()
+        self.start_time = datetime.datetime.now()
 
     def print_running_time(self):
-        print(f'\nRunning time: {datetime.now() - self.start_time}')
+        print(f'\nRunning time: {datetime.datetime.now() - self.start_time}')
 
     def remove_empty_directories(self):
         """
@@ -85,6 +82,8 @@ class ClassificationGenerator():
         if empty_dirs:
             output_txt = define_output_file(self.output_path, self.root, self.meta_dir_flag, 
                                             output_suffix = "_EmptyDirectoriesRemoved", output_format = "txt")
+            output_txt = define_output_file(self.output_path, self.root, self.meta_dir_flag, 
+                                            output_suffix = "_EmptyDirectoriesRemoved", output_format = "txt")
             export_list_txt(empty_dirs, output_txt)
         else:
             print('No directories removed!')
@@ -94,18 +93,17 @@ class ClassificationGenerator():
         Sorts the list alphabetically and filters out certain files.
         """
         try:
-            if not self.hidden_flag:
-                list_directories = sorted([f.name for f in os.scandir(directory)
-                                            if not f.name.startswith('.')
-                                            and not bool(os.stat(win_256_check(os.path.join(directory, f.name))).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN)
-                                            and not f.name.endswith('.opex')
-                                            and f.name != 'meta'
-                                            and f.name != os.path.basename(__file__)], key = str.casefold)
-            else:
-                list_directories = sorted([f.name for f in os.scandir(directory)
-                                            if not f.name.endswith('.opex')
-                                            and f.name != 'meta'
-                                            and f.name != os.path.basename(__file__)], key = str.casefold)
+            if self.hidden_flag is False:
+                list_directories = sorted([win_256_check(os.path.join(directory, f.name)) for f in os.scandir(directory)
+                                        if not f.name.startswith('.')
+                                        and filter_win_hidden(win_256_check(os.path.join(directory, f.name))) is False
+                                        and f.name != 'meta'
+                                        and f.name != os.path.basename(__file__)]
+                                        , key=str.casefold)
+            elif self.hidden_flag is True:
+                list_directories = sorted([os.path.join(directory, f.name) for f in os.scandir(directory) \
+                                        if f.name != 'meta' \
+                                        and f.name != os.path.basename(__file__)], key=str.casefold)
             return list_directories
         except Exception as e:
             print('Failed to Filter')
@@ -136,9 +134,9 @@ class ClassificationGenerator():
                         'Parent': os.path.abspath(os.path.join(os.path.abspath(parse_path), os.pardir)), 
                         'Attribute': file_type, 
                         'Size': file_stats.st_size, 
-                        'CreateDate': datetime.fromtimestamp(file_stats.st_ctime), 
-                        'ModifiedDate': datetime.fromtimestamp(file_stats.st_mtime), 
-                        'AccessDate': datetime.fromtimestamp(file_stats.st_atime), 
+                        'CreateDate': datetime.datetime.fromtimestamp(file_stats.st_ctime), 
+                        'ModifiedDate': datetime.datetime.fromtimestamp(file_stats.st_mtime), 
+                        'AccessDate': datetime.datetime.fromtimestamp(file_stats.st_atime), 
                         'Level': level, 
                         'Ref_Section': ref}
             if self.fixity and not os.path.isdir(file_path):
@@ -168,6 +166,7 @@ class ClassificationGenerator():
                 ref = int(ref) + int(1)
                 if os.path.isdir(file_path):
                     self.list_directories(file_path, ref = 1)
+                    self.list_directories(file_path, ref = 1)
         except Exception as e:
             print(e)
             print("Error occurred for directory/file: {}".format(list_directory))
@@ -182,6 +181,7 @@ class ClassificationGenerator():
         (lookup is based on File Path's), and unnecessary data is dropped.
         Any errors are turned to 0 and the result are based on the reference loop initialisation.
         """
+        self.parse_directory_dict(file_path = self.root, level = 0, ref = 0)
         self.parse_directory_dict(file_path = self.root, level = 0, ref = 0)
         self.list_directories(self.root, self.start_ref)
         self.df = pd.DataFrame(self.record_list)
@@ -209,7 +209,9 @@ class ClassificationGenerator():
         for REF, PARENT, LEVEL in self.list_loop:
             c += 1
             print(f"Generating Auto Classification for: {c} / {tot}", end = "\r")
+            print(f"Generating Auto Classification for: {c} / {tot}", end = "\r")
             TRACK = 1  
+            self.reference_loop(REF, PARENT, TRACK, LEVEL)
             self.reference_loop(REF, PARENT, TRACK, LEVEL)
 
         self.df['Archive_Reference'] = self.reference_list
@@ -291,7 +293,14 @@ class ClassificationGenerator():
                 if self.accession_prefix:
                     accession_ref = self.accession_prefix + "-Dir"
                 else: accession_ref = "Dir"
+                if self.accession_prefix:
+                    accession_ref = self.accession_prefix + "-Dir"
+                else: accession_ref = "Dir"
             else:
+                if self.accession_prefix:
+                    accession_ref = self.accession_prefix + "-" + str(self.accession_count)
+                else:
+                    accession_ref = self.accession_count
                 if self.accession_prefix:
                     accession_ref = self.accession_prefix + "-" + str(self.accession_count)
                 else:
@@ -303,8 +312,21 @@ class ClassificationGenerator():
                     accession_ref = self.accession_prefix + "-" + str(self.accession_count)
                 else:
                     accession_ref = self.accession_count
+                if self.accession_prefix:
+                    accession_ref = self.accession_prefix + "-" + str(self.accession_count)
+                else:
+                    accession_ref = self.accession_count
                 self.accession_count += 1
             else:
+                if self.accession_prefix:
+                    accession_ref = self.accession_prefix + "-File"
+                else:
+                    accession_ref = "File"
+        elif self.accession_flag.lower() == "all":
+            if self.accession_prefix:
+                accession_ref = self.accession_prefix + "-" + str(self.accession_count)
+            else:
+                accession_ref = self.accession_count
                 if self.accession_prefix:
                     accession_ref = self.accession_prefix + "-File"
                 else:
@@ -323,11 +345,17 @@ class ClassificationGenerator():
         """
         if self.empty_flag:
             self.remove_empty_directories()
+        if self.empty_flag:
+            self.remove_empty_directories()
         self.init_dataframe()
+        output_file = define_output_file(self.output_path, self.root, meta_dir_flag = self.meta_dir_flag, 
+                                         output_format = self.output_format)
         output_file = define_output_file(self.output_path, self.root, meta_dir_flag = self.meta_dir_flag, 
                                          output_format = self.output_format)
         if self.output_format == "xlsx":
             export_xl(df = self.df, output_filename = output_file)
+            export_xl(df = self.df, output_filename = output_file)
         elif self.output_format == "csv":
+            export_csv(df = self.df, output_filename = output_file)
             export_csv(df = self.df, output_filename = output_file)
         self.print_running_time()
