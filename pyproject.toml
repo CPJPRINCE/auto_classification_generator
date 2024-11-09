@@ -5,7 +5,6 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "auto_classification_generator"
 version = "1.1.4"
-version = "1.1.4"
 authors = [
     {name="Christopher Prince", email="c.pj.prince@gmail.com"}
     ]
