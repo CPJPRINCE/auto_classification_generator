@@ -27,34 +27,51 @@ class ClassificationGenerator():
                  accession_flag: bool = False, 
                  meta_dir_flag: bool = True, 
                  hidden_flag: bool = False, 
-                 output_format: str = "xlsx"):
+                 output_format: str = "xlsx",
+                 delimiter: str = "/",
+                 keywords: list = None,
+                 keywords_mode: str = "intialise",
+                 keywords_retain_order: bool = False,
+                 sort_key = lambda x: (os.path.isfile(x), str.casefold(x)),
+                 keywords_abbreviation_number: int = 3):
 
         self.root = os.path.abspath(root)
         self.root_level = self.root.count(os.sep)
         self.root_path = os.path.dirname(self.root)
         self.output_path = output_path
         self.output_format = output_format
-        self.empty_flag = empty_flag
-        self.skip_flag = skip_flag
-        self.hidden_flag = hidden_flag
         self.prefix = prefix
         self.start_ref = start_ref
         self.fixity = fixity
-        self.reference_list = []
-        self.record_list = []
-        self.accession_flag = accession_flag
-        self.accession_list = []
+        self.delimiter = delimiter
+        if self.delimiter is None:
+            self.delimiter_flag = False
+        else:
+            self.delimiter_flag = True
+        self.keyword_list = keywords
+        self.keywords_mode = keywords_mode
+        self.keywords_retain_order = keywords_retain_order
+        self.sort_key = sort_key
+        self.keywords_abbreviation_number = keywords_abbreviation_number
+
         self.accession_count = start_ref
         if accprefix:
             self.accession_prefix = accprefix
         else:
             self.accession_prefix = prefix
-        self.empty_list = []
-        self.meta_dir_flag = meta_dir_flag
-        self.start_time = datetime.datetime.now()
 
-    def print_running_time(self):
-        print(f'\nRunning time: {datetime.datetime.now() - self.start_time}')
+        self.reference_list = []
+        self.record_list = []
+        self.empty_list = []
+        self.accession_list = []
+
+        self.meta_dir_flag = meta_dir_flag
+        self.accession_flag = accession_flag
+        self.empty_flag = empty_flag
+        self.skip_flag = skip_flag
+        self.hidden_flag = hidden_flag
+
+        self.start_time = datetime.datetime.now()
 
     def remove_empty_directories(self):
         """
@@ -86,7 +103,7 @@ class ClassificationGenerator():
         else:
             print('No directories removed!')
 
-    def filter_directories(self, directory):
+    def filter_directories(self, directory, sort_key = lambda x: (os.path.isfile(x), str.casefold(x))):
         """
         Sorts the list alphabetically and filters out certain files.
         """
@@ -96,12 +113,13 @@ class ClassificationGenerator():
                                         if not f.name.startswith('.')
                                         and filter_win_hidden(win_256_check(os.path.join(directory, f.name))) is False
                                         and f.name != 'meta'
-                                        and f.name != os.path.basename(__file__)]
-                                        , key=str.casefold)
+                                        and f.name != os.path.basename(__file__)],
+                                        key = sort_key)
             elif self.hidden_flag is True:
                 list_directories = sorted([os.path.join(directory, f.name) for f in os.scandir(directory) \
                                         if f.name != 'meta' \
-                                        and f.name != os.path.basename(__file__)], key=str.casefold)
+                                        and f.name != os.path.basename(__file__)],
+                                        key = sort_key)
             return list_directories
         except Exception:
             print('Failed to Filter')
@@ -118,7 +136,9 @@ class ClassificationGenerator():
                 parse_path = file_path
             file_stats = os.stat(file_path)
             if self.accession_flag:
-                acc_ref = self.accession_running_number(parse_path)
+                if self.delimiter_flag is False:
+                    self.delimiter = "-"
+                acc_ref = self.accession_running_number(parse_path, self.delimiter)
                 self.accession_list.append(acc_ref)
             if os.path.isdir(file_path):
                 file_type = "Dir"
@@ -151,16 +171,34 @@ class ClassificationGenerator():
         Generates a list of directories. Also calculates level and a running reference number.
         """
         ref = int(ref)
+        pref = None
         try:
-            list_directory = self.filter_directories(directory)
+            list_directory = self.filter_directories(directory, sort_key = self.sort_key)
             if directory.startswith(u'\\\\?\\'):
                 level = directory.replace(u'\\\\?\\', "").count(os.sep) - self.root_level + 1
             else:
                 level = directory.count(os.sep) - self.root_level + 1
-            for file in list_directory:
-                file_path = win_256_check(os.path.join(directory, file))
+            for file_path in list_directory:
+                file_name = win_file_split(file_path)
+                if self.keyword_list is not None:
+                    if len(self.keyword_list) == 0 and os.path.isdir(file_path):
+                        if self.keywords_retain_order is False:
+                            pref = ref - 1
+                        elif self.keywords_retain_order is True:
+                            pref = ref
+                        ref = str(keyword_replace(file_name, mode=self.keywords_mode, abbreviation_number=self.keywords_abbreviation_number))
+                    elif any(file_name in keyword for keyword in self.keyword_list) and os.path.isdir(file_path):
+                        if self.keywords_retain_order is False:
+                            pref = ref - 1
+                        elif self.keywords_retain_order is True:
+                            pref = ref
+                        ref = str(keyword_replace(file_name, mode=self.keywords_mode, abbreviation_number=self.keywords_abbreviation_number))
                 self.parse_directory_dict(file_path, level, ref)
-                ref = int(ref) + int(1)
+                if pref:
+                    ref = int(pref) + 1
+                    pref = None
+                else:
+                    ref = int(ref) + 1
                 if os.path.isdir(file_path):
                     self.list_directories(file_path, ref = 1)
         except Exception:
@@ -184,7 +222,7 @@ class ClassificationGenerator():
         self.df = self.df.rename(columns = {'Ref_Section_x': 'Ref_Section', 'Ref_Section_y': 'Parent_Ref', 
                                           'FullName_x': 'FullName'})
         self.df['Parent_Ref'] = self.df['Parent_Ref'].fillna(0)
-        self.df = self.df.astype({'Parent_Ref': int})
+        self.df = self.df.astype({'Parent_Ref': str})
         self.df.index.name = "Index"
         self.list_loop = self.df[['Ref_Section', 'Parent', 'Level']].values.tolist()
         if self.skip_flag:
@@ -199,82 +237,82 @@ class ClassificationGenerator():
         """
         c = 0
         tot = len(self.list_loop)
-        for REF, PARENT, LEVEL in self.list_loop:
+        for ref, parent, level in self.list_loop:
             c += 1
             print(f"Generating Auto Classification for: {c} / {tot}", end = "\r")
-            TRACK = 1  
-            self.reference_loop(REF, PARENT, TRACK, LEVEL)
+            if self.delimiter_flag is False:
+                self.delimiter = "/"
+            self.reference_loop(ref = ref, parent = parent, track = 1, level = level, delimiter = self.delimiter)
 
         self.df['Archive_Reference'] = self.reference_list
         if self.accession_flag:
             self.df['Accession_Reference'] = self.accession_list
         return self.df
 
-    def reference_loop(self, REF, PARENT, TRACK, LEVEL, NEWREF = None):
+    def reference_loop(self, ref: str, parent: str, track: int, level: int, newref: str = None, delimiter: str = "/"):
         """
         The Reference loop works upwards, running an "index lookup" against the parent folder until it reaches the top.
 
-        REF is the reference section derived from the list in the list_directories function. [Stays Constant]
+        ref is the reference section derived from the list in the list_directories function. [Stays Constant]
         PARENT is the parent folder of the child. [Varies]
         TRACK is an iteration tracker to distinguish between first and later iterations. [Varies]
         LEVEL is the level of the folder, 0 being the root. [Stays Constant]
 
-        NEWREF is the archive reference constructed during this loop.
+        newref is the archive reference constructed during this loop.
 
         To do this, the reference loop works upwards, running an "index lookup" against the parent folder until it reaches the top.
         1) To start, the reference loop indexes from the dataframe established by listing the directories.
         2) The index compares FullName against the Parent (So acting on the Basis of File Path's)
         3) If the index fails / is 0, then the top has been reached.
-        4) In that event if LEVEL is also 0 IE the top-most item is being looked at (normally the first thing). NEWREF is set to REF
-        5) Otherwise the top-most level has been reached and, NEWREF is simply NEWREF.
+        4) In that event if LEVEL is also 0 IE the top-most item is being looked at (normally the first thing). newref is set to ref
+        5) Otherwise the top-most level has been reached and, newref is simply newref.
         6) If the index does matches, then top level has not yet been reached. In this case we also account for the PARENT's Reference, to avoid an error at the 2nd to top layer.
         7) PARENTREF is looked up, by Indexing the Dataframe. Then if PARENTREF is 0, IE we're on the 2nd top layer. We check the TRACK.
-        8) If TRACK is 1, IE the first iteration on the 2nd layer, NEWREF is just REF.
-        9) If TRACK isn't 1, IE subsequent iterations on the 2nd layer, NEWREF is just itself.
-        10) If PARENTREF isn't 0, then we concatenate the PARENTREF with either REF or NEWREF.
-        11) If TRACK is 1, NEWREF is PARENTREF + REF.
-        12) If TRACK isn't 1, NEWREF is PARENTREF + NEWREF.
+        8) If TRACK is 1, IE the first iteration on the 2nd layer, newref is just ref.
+        9) If TRACK isn't 1, IE subsequent iterations on the 2nd layer, newref is just itself.
+        10) If PARENTREF isn't 0, then we concatenate the PARENTREF with either ref or newref.
+        11) If TRACK is 1, newref is PARENTREF + ref.
+        12) If TRACK isn't 1, newref is PARENTREF + newref.
         13) At the end of the process the PARENT of the current folder is looked up and SUBPARENT replace's the PARENT variable. TRACK is also advanced.
         14) Then the function is then called upon recursively. In this way the loop will work through until it reaches the top.
         15) This is only called upon if the index does not fail. If it does fail, then the top-level is reached and the loop escaped.
         16) As this is acting within the Loop from the init stage, this will operate on all files within a list.
         """
         try:
-            idx = self.df['FullName'][self.df['FullName'] == PARENT].index
+            idx = self.df['FullName'][self.df['FullName'] == parent].index
             if idx.size == 0:
-                if LEVEL == 0:
-                    NEWREF = str(REF)
+                if level == 0:
+                    newref = str(ref)
                     if self.prefix:
-                        NEWREF = str(self.prefix)
+                        newref = str(self.prefix)
                 else:
-                    NEWREF = str(NEWREF)
+                    newref = str(newref)
                     if self.prefix:
-                        NEWREF = str(self.prefix) + "/" + str(NEWREF)
-                self.reference_list.append(NEWREF)
+                        newref = str(self.prefix) + delimiter + str(newref)
+                self.reference_list.append(newref)
             else:
-                PARENTREF = self.df['Ref_Section'].loc[idx].item()
-                if PARENTREF == 0:
-                    if TRACK == 1:
-                        NEWREF = str(REF)
+                parentref = self.df['Ref_Section'].loc[idx].item()
+                if parentref == 0:
+                    if track == 1:
+                        newref = str(ref)
                     else:
-                        NEWREF = str(NEWREF)
+                        newref = str(newref)
                 else:
-                    if TRACK == 1:
-                        NEWREF = str(PARENTREF) + "/" + str(REF)
+                    if track == 1:
+                        newref = str(parentref) + delimiter + str(ref)
                     else:
-                        NEWREF = str(PARENTREF) + "/" + str(NEWREF)
-
-                SUBPARENT = self.df['Parent'].loc[idx].item()
-                PARENT = SUBPARENT
-                TRACK = TRACK + 1
-                self.reference_loop(REF, PARENT, TRACK, LEVEL, NEWREF)
+                        newref = str(parentref) + delimiter + str(newref)
+                parent = self.df['Parent'].loc[idx].item()
+                track = track + 1
+                self.reference_loop(ref, parent, track, level, newref, delimiter=delimiter)
 
         except Exception as e:
             print('Error in Reference Loop.')
+            print(e)
             raise SystemError()
             pass
 
-    def accession_running_number(self, file_path):
+    def accession_running_number(self, file_path: str, delimiter: str = "-"):
         """
         Generates a Running Number / Accession Code, can be set to 3 different "modes", counting Files, Directories or Both
         """
@@ -282,36 +320,36 @@ class ClassificationGenerator():
         if self.accession_flag.lower() == "file":
             if os.path.isdir(file_path):
                 if self.accession_prefix:
-                    accession_ref = self.accession_prefix + "-Dir"
+                    accession_ref = self.accession_prefix + delimiter + "Dir"
                 else:
                     accession_ref = "Dir"
             else:
                 if self.accession_prefix:
-                    accession_ref = self.accession_prefix + "-" + str(self.accession_count)
+                    accession_ref = self.accession_prefix + delimiter + str(self.accession_count)
                 else:
                     accession_ref = self.accession_count
                 self.accession_count += 1
         elif self.accession_flag.lower() == "dir":
             if os.path.isdir(file_path):
                 if self.accession_prefix:
-                    accession_ref = self.accession_prefix + "-" + str(self.accession_count)
+                    accession_ref = self.accession_prefix + delimiter + str(self.accession_count)
                 else:
                     accession_ref = self.accession_count
                 self.accession_count += 1
             else:
                 if self.accession_prefix:
-                    accession_ref = self.accession_prefix + "-File"
+                    accession_ref = self.accession_prefix + delimiter + "File"
                 else:
                     accession_ref = "File"
         elif self.accession_flag.lower() == "all":
             if self.accession_prefix:
-                accession_ref = self.accession_prefix + "-" + str(self.accession_count)
+                accession_ref = self.accession_prefix + delimiter + str(self.accession_count)
             else:
-                accession_ref = self.accession_count
                 if self.accession_prefix:
-                    accession_ref = self.accession_prefix + "-File"
+                    accession_ref = self.accession_prefix + self.accession_count
                 else:
-                    accession_ref = "File"
+                    accession_ref = self.accession_count
+                self.accession_count += 1
         return accession_ref
 
     def main(self):
@@ -327,4 +365,13 @@ class ClassificationGenerator():
             export_xl(df = self.df, output_filename = output_file)
         elif self.output_format == "csv":
             export_csv(df = self.df, output_filename = output_file)
-        self.print_running_time()
+        elif self.output_format == "ods":
+            export_ods(df = self.df, output_filename = output_file)
+        elif self.output_format == "json":
+            export_json(df = self.df, output_filename = output_file)
+        elif self.output_format == "xml":
+            export_xml(df = self.df, output_filename = output_file)
+        elif self.output_format == "dict":
+            return export_dict(df = self.df)
+
+        print_running_time(self.start_time)

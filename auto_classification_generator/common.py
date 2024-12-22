@@ -6,6 +6,7 @@ license: Apache License 2.0"
 """
 
 import os, time, sys, stat
+import datetime
 import pandas as pd
 
 def path_check(path: str):
@@ -48,6 +49,28 @@ def export_csv(df: pd.DataFrame, output_filename: str):
     finally:
         print(f"Saved to: {output_filename}")
 
+def export_json(df: pd.DataFrame, output_filename: str):
+    try:
+        df.to_json(output_filename,orient='index', indent=4)
+    except Exception as e:
+        print(e)
+        print('Waiting 10 Seconds to try again...')
+        time.sleep(10)
+        export_json(df, output_filename)
+    finally:
+        print(f"Saved to: {output_filename}")
+
+def export_xml(df: pd.DataFrame, output_filename: str):
+    try:
+        df.to_xml(output_filename)
+    except Exception as e:
+        print(e)
+        print('Waiting 10 Seconds to try again...')
+        time.sleep(10)
+        export_xml(df, output_filename)
+    finally:
+        print(f"Saved to: {output_filename}")
+
 def export_xl(df: pd.DataFrame, output_filename: str):
     try:
         with pd.ExcelWriter(output_filename,mode = 'w') as writer:
@@ -60,6 +83,27 @@ def export_xl(df: pd.DataFrame, output_filename: str):
     finally:
         print(f"Saved to: {output_filename}")
 
+def export_ods(df: pd.DataFrame, output_filename: str):
+    try:
+        with pd.ExcelWriter(output_filename,engine='odf',mode = 'w') as writer:
+            df.to_excel(writer)
+    except Exception as e:
+        print(e)
+        print('Waiting 10 Seconds to try again...')
+        time.sleep(10)
+        export_xl(df,output_filename)
+    finally:
+        print(f"Saved to: {output_filename}")
+
+def export_dict(df: pd.DataFrame):
+    try:
+        return df.to_dict('records')
+    except Exception as e:
+        print(e)
+        print('Waiting 10 Seconds to try again...')
+        time.sleep(10)
+        return df.to_dict('records')
+
 def win_256_check(path: str):
     if len(path) > 255 and sys.platform == "win32":
         if path.startswith(u'\\\\?\\'):
@@ -68,11 +112,34 @@ def win_256_check(path: str):
             path = u"\\\\?\\" + path
     return path
 
+def win_file_split(path: str):
+    if sys.platform == "win32":
+        path = path.rsplit("\\",1)[-1]
+    else:
+        path = path.rsplit("/",1)[-1]
+    return path
+
 def filter_win_hidden(path: str):
     try:
-        if bool(os.stat(path).st_file_attribute & stat.FILE_ATTRIBUTE_HIDDEN) is True:
+        if bool(os.stat(path).st_file_attributes & stat.FILE_ATTRIBUTE_HIDDEN) is True:
             return True
         else:
             return False
     except:
         return False
+
+def keyword_replace(text: str, mode: str = "intialise", abbreviation_number: int = 3):
+    text = text.translate(str.maketrans('','',r"""!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"""))
+    if mode == "intialise":
+        if len(text.split(" ")) > 1:
+            return "".join([x[0] for x in text.upper().split(" ")])
+        else:
+            return text[0:abbreviation_number].upper().replace(' ','')
+    elif mode == "firstletters":
+        return text[0:abbreviation_number].upper().replace(' ','')
+    else:
+        print('Invalid keyword mode')
+        raise SystemExit()
+    
+def print_running_time(start_time):
+    print(f'\nRunning time: {datetime.datetime.now() - start_time}')
