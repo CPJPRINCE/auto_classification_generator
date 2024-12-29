@@ -128,14 +128,20 @@ def filter_win_hidden(path: str):
     except:
         return False
 
-def keyword_replace(text: str, mode: str = "intialise", abbreviation_number: int = 3):
+def keyword_replace(text: str, mode: str = "intialise", abbreviation_number: int = None):
     text = text.translate(str.maketrans('','',r"""!"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"""))
     if mode == "intialise":
         if len(text.split(" ")) > 1:
-            return "".join([x[0] for x in text.upper().split(" ")])
+            if abbreviation_number is None:
+                abbreviation_number = -1
+            return "".join([x[0] for x in text.upper().split(" ", abbreviation_number)])
         else:
+            if abbreviation_number is None:
+                abbreviation_number = 3
             return text[0:abbreviation_number].upper().replace(' ','')
     elif mode == "firstletters":
+        if abbreviation_number is None:
+            abbreviation_number = 3
         return text[0:abbreviation_number].upper().replace(' ','')
     else:
         print('Invalid keyword mode')

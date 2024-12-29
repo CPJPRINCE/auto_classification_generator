@@ -38,7 +38,7 @@ def parse_args():
                         help = "Set to alternate keyword mode: 'intialise' will use intials of words; 'firstletters' will use the first letters of the string")
     parser.add_argument("--keywords-retain-order", required = False, default = False, action = 'store_true', 
                         help = "Set when using keywords to continue reference numbering. If not used keywords don't 'count' to reference numbering")
-    parser.add_argument("--keywords-abbreviation-number", required = False, nargs='+', default = 3, type = int,
+    parser.add_argument("--keywords-abbreviation-number", required = False, nargs='+', default = None, type = int,
                         help = "Set to set the number of letters to abbreviate for 'firstletters' mode, does not impact 'intialise' [currently]")
     parser.add_argument("--sort-by", required=False, nargs = '?', default = 'foldersfirst', choices = ['foldersfirst','alphabetical'], type=str.lower,
                         help = "Set the sorting method, 'foldersfirst' sorts folders first then files alphabetically; 'alphabetically' sorts alphabetically (ignoring folder distinction)")

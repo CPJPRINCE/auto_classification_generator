@@ -13,8 +13,33 @@ from auto_classification_generator.common import *
 from auto_classification_generator.hash import *
 import os, time, datetime
 import pandas as pd
+import configparser
 
 class ClassificationGenerator():
+    """
+    A Tool for generating archival references for any given directory for use by Digital Archivists.
+    Will turn the hierachy of a folder into and return the results as spreadsheet (or other output).
+
+    :param root: the directory to generate references for
+    :param output_path: set the output path
+    :param prefix: set a prefix to append to generated references
+    :param accprefix: set a prefix to append to generated accession references
+    :param start_ref: set the starting reference, only affects first instance
+    :param fixity: set whether to generate fixites
+    :param empty_flag: set whether to delete and log empty directories
+    :param skip_flag: set whether to skip reference generation (outputs set data)
+    :param accession_flag: set whether to generate accession reference (running number)
+    :param meta_dir_flag: set whether to generate a 'meta' dir for output
+    :param hidden_flag: set to include hidden files/directories
+    :param output_format: set to specify output format [xlsx, csv, ods, xml, json, dict] are supported, may require additional modules.
+    :param delimiter: set delimiter for generated references
+    :param keywords: set to replace numbers in reference with alphabetical characters, specified in list
+    :param keywords_mode: set to specify keywords mode [intialise, firstletters] 
+    :param keywords_retain_order: set to continue counting reference, if keyword is used, skips numbers if not
+    :param sort_key: set the sort key, can be any valid function for sorted
+    :param keywords_abbreviation: set int for number of characters to abbreviate to for keywords mode
+    :param options_file: set an options file to adjust field parameters
+    """
     def __init__(self, 
                  root: str, 
                  output_path: str = os.getcwd(), 
@@ -33,7 +58,8 @@ class ClassificationGenerator():
                  keywords_mode: str = "intialise",
                  keywords_retain_order: bool = False,
                  sort_key = lambda x: (os.path.isfile(x), str.casefold(x)),
-                 keywords_abbreviation_number: int = 3):
+                 keywords_abbreviation_number: int = None,
+                 options_file: str = os.path.join(os.path.dirname(__file__),'options.properties')):
 
         self.root = os.path.abspath(root)
         self.root_level = self.root.count(os.sep)
@@ -71,7 +97,45 @@ class ClassificationGenerator():
         self.skip_flag = skip_flag
         self.hidden_flag = hidden_flag
 
+        self.parse_config(options_file=os.path.abspath(options_file))
         self.start_time = datetime.datetime.now()
+
+    def parse_config(self, options_file: str = 'options.properties'):
+        config = configparser.ConfigParser()
+        config.read(options_file, encoding='utf-8')
+        global INDEX_FIELD
+        INDEX_FIELD = config['options']['INDEX_FIELD']
+        global PATH_FIELD
+        PATH_FIELD = config['options']['PATH_FIELD']
+        global RELATIVE_FIELD
+        RELATIVE_FIELD = config['options']['RELATIVE_FIELD']
+        global PARENT_FIELD
+        PARENT_FIELD = config['options']['PARENT_FIELD']
+        global PARENT_REF
+        PARENT_REF = config['options']['PARENT_REF']
+        global REFERENCE_FIELD
+        REFERENCE_FIELD = config['options']['REFERENCE_FIELD']
+        global ACCESSION_FIELD
+        ACCESSION_FIELD = config['options']['ACCESSION_FIELD']
+        global REF_SECTION
+        REF_SECTION = config['options']['REF_SECTION']
+        global LEVEL_FIELD
+        LEVEL_FIELD = config['options']['LEVEL_FIELD']
+        global BASENAME_FIELD
+        BASENAME_FIELD = config['options']['BASENAME_FIELD']
+        global EXTENSION_FIELD
+        EXTENSION_FIELD = config['options']['EXTENSION_FIELD']
+        global ATTRIBUTE_FIELD
+        ATTRIBUTE_FIELD = config['options']['ATTRIBUTE_FIELD']
+        global SIZE_FIELD
+        SIZE_FIELD = config['options']['SIZE_FIELD']
+        global CREATEDATE_FIELD
+        CREATEDATE_FIELD = config['options']['CREATEDATE_FIELD']
+        global MODDATE_FIELD
+        MODDATE_FIELD = config['options']['MODDATE_FIELD']        
+        global ACCESSDATE_FIELD
+        ACCESSDATE_FIELD = config['options']['ACCESSDATE_FIELD']
+
 
     def remove_empty_directories(self):
         """
@@ -144,18 +208,19 @@ class ClassificationGenerator():
                 file_type = "Dir"
             else:
                 file_type = "File"
-            class_dict = {'RelativeName': str(parse_path).replace(self.root_path, ""), 
-                        'FullName': str(os.path.abspath(parse_path)), 
-                        'Basename': os.path.splitext(os.path.basename(file_path))[0], 
-                        'Extension': os.path.splitext(file_path)[1], 
-                        'Parent': os.path.abspath(os.path.join(os.path.abspath(parse_path), os.pardir)), 
-                        'Attribute': file_type, 
-                        'Size': file_stats.st_size, 
-                        'CreateDate': datetime.datetime.fromtimestamp(file_stats.st_ctime), 
-                        'ModifiedDate': datetime.datetime.fromtimestamp(file_stats.st_mtime), 
-                        'AccessDate': datetime.datetime.fromtimestamp(file_stats.st_atime), 
-                        'Level': level, 
-                        'Ref_Section': ref}
+            class_dict = {
+                        PATH_FIELD: str(os.path.abspath(parse_path)),
+                        RELATIVE_FIELD: str(parse_path).replace(self.root_path, ""), 
+                        BASENAME_FIELD: os.path.splitext(os.path.basename(file_path))[0], 
+                        EXTENSION_FIELD: os.path.splitext(file_path)[1], 
+                        PARENT_FIELD: os.path.abspath(os.path.join(os.path.abspath(parse_path), os.pardir)), 
+                        ATTRIBUTE_FIELD: file_type, 
+                        SIZE_FIELD: file_stats.st_size, 
+                        CREATEDATE_FIELD: datetime.datetime.fromtimestamp(file_stats.st_ctime), 
+                        MODDATE_FIELD: datetime.datetime.fromtimestamp(file_stats.st_mtime), 
+                        ACCESSDATE_FIELD: datetime.datetime.fromtimestamp(file_stats.st_atime), 
+                        LEVEL_FIELD: level, 
+                        REF_SECTION: ref}
             if self.fixity and not os.path.isdir(file_path):
                 hash = HashGenerator(self.fixity).hash_generator(file_path)
                 class_dict.update({"Algorithm": self.fixity, "Hash": hash})
@@ -216,15 +281,15 @@ class ClassificationGenerator():
         self.parse_directory_dict(file_path = self.root, level = 0, ref = 0)
         self.list_directories(self.root, self.start_ref)
         self.df = pd.DataFrame(self.record_list)
-        self.df = self.df.merge(self.df[['FullName', 'Ref_Section']], how = 'left', left_on = 'Parent', 
-                                right_on = 'FullName')
-        self.df = self.df.drop(['FullName_y'], axis = 1)
-        self.df = self.df.rename(columns = {'Ref_Section_x': 'Ref_Section', 'Ref_Section_y': 'Parent_Ref', 
-                                          'FullName_x': 'FullName'})
-        self.df['Parent_Ref'] = self.df['Parent_Ref'].fillna(0)
-        self.df = self.df.astype({'Parent_Ref': str})
+        self.df = self.df.merge(self.df[[INDEX_FIELD, REF_SECTION]], how = 'left', left_on = PARENT_FIELD, 
+                                right_on = INDEX_FIELD)
+        self.df = self.df.drop([f'{INDEX_FIELD}_y'], axis = 1)
+        self.df = self.df.rename(columns = {f'{REF_SECTION}_x': REF_SECTION, f'{REF_SECTION}_y': PARENT_REF, 
+                                          f'{INDEX_FIELD}_x': INDEX_FIELD})
+        self.df[PARENT_REF] = self.df[PARENT_REF].fillna(0)
+        self.df = self.df.astype({PARENT_REF: str})
         self.df.index.name = "Index"
-        self.list_loop = self.df[['Ref_Section', 'Parent', 'Level']].values.tolist()
+        self.list_loop = self.df[[REF_SECTION, PARENT_FIELD, LEVEL_FIELD]].values.tolist()
         if self.skip_flag:
             pass
         else:
@@ -244,9 +309,9 @@ class ClassificationGenerator():
                 self.delimiter = "/"
             self.reference_loop(ref = ref, parent = parent, track = 1, level = level, delimiter = self.delimiter)
 
-        self.df['Archive_Reference'] = self.reference_list
+        self.df[REFERENCE_FIELD] = self.reference_list
         if self.accession_flag:
-            self.df['Accession_Reference'] = self.accession_list
+            self.df[ACCESSION_FIELD] = self.accession_list
         return self.df
 
     def reference_loop(self, ref: str, parent: str, track: int, level: int, newref: str = None, delimiter: str = "/"):
@@ -279,7 +344,7 @@ class ClassificationGenerator():
         16) As this is acting within the Loop from the init stage, this will operate on all files within a list.
         """
         try:
-            idx = self.df['FullName'][self.df['FullName'] == parent].index
+            idx = self.df[INDEX_FIELD][self.df[INDEX_FIELD] == parent].index
             if idx.size == 0:
                 if level == 0:
                     newref = str(ref)
