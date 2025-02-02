@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "auto_classification_generator"
-version = "1.2.0"
+version = "1.2.1"
 authors = [
     {name="Christopher Prince", email="c.pj.prince@gmail.com"}
     ]
