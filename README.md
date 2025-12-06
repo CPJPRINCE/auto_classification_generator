@@ -131,7 +131,7 @@ When you generate an Accession Reference an Archive_Reference code will always a
 
 ## Set start reference
 
-To set a start reference simply add `-s` followed by (Note this must be numeral)
+To set a start reference simply add `-str` followed by (Note this must be numeral)
 
 ## Clear Empty Directories
 
@@ -153,58 +153,112 @@ By default hidden folders and folders named 'meta' will be ignored. You can incl
 
 ## Skip
 
-If you just want to generate a spreadsheet without a reference code you can add `--skip`, and it will gsimply generate a spreadsheet without the Archive_Reference
+If you just want to generate a spreadsheet without a reference code you can add `-skp | --skip`, and it will gsimply generate a spreadsheet without the Archive_Reference
 
 ## Options:
 
-The following options are currently available to run the program with:
+For up to date options use the `-h` option to show dialog:
 
 ```
 Options:
         -h,     --help          Show Help dialog                              
+
         -p,     --prefix        Replace Root 0 with specified prefix            [string]
+                                Is added to all references
+
+        -s      --suffix        Add a suffix to references                      [string]
+
+        --suffix-options        Set whether to apply to files,                  {apply_to_files,apply_to_folders,
+                                folders,or to all                               apply_to_all}
+                                default is to apply_to_files.
         
-        -acc,   -accession      Run in "Accession Mode", this will              {None,Dir,File,
-                                                                                All}           
-                                generate a running number of either Files, 
-                                Directories or Both {None,Dir,File,All}
+        -dlm    --delimiter     Set to change the default delimiter             [string]
+
+        -acc,   --accession     Run in "Accession Mode", this will              {Dir,File,
+                                generate a running number of either             All}
+                                Files, directories, or Both                                                           
+                                
         -accp,  --acc-prefix    Set the Prefix to append onto the running       [boolean]
                                 number generated in "Accession Mode"
         
         -fx     --fixity        Generate fixity codes for files                 {MD5, SHA-1, 
                                                                                 SHA-256, SHA-512}
         
-        --hidden                Include Hidden directories and files in         [boolean]
+        -hid    --hidden        Include Hidden directories and files in         [boolean]
                                 generation.
 
-        -rm     --empty         Will remove all Empty Directories from          [boolean]
+        --rm-empty              Will remove all Empty Directories from          [boolean]
                                 within a given folder, not including them
                                 in the Reference Generation.
                                 A simply Text list of removed folders is 
                                 then generated to the output directory.
         
-        -s,     --start-ref     Set the number to start the Reference           [int] 
+        -str,     --start-ref   Set the number to start the Reference           [int] 
                                 generation from.
         
         -o,     --output        Set the directory to export the spreadsheet to. [string]      
         
-        -m,     --meta-dir      Set whether to generate a "meta" directory,     [boolean]
+        --disable-meta-dir      Set whether to generate a "meta" directory,     [boolean]
                                 to export CSV / Excel file to.
                                 Default behavior will be to create a directory,
                                 using this option will disable it.      
         
-        --skip                  Skip running the Auto Classification process,   [boolean]
+        -skp    --skip          Skip running the Auto Classification process,   [boolean]
                                 will generate a spreadsheet but not
                                 an Archival Reference
         
-        -fmt,   --format        Set whether to export as a CSV or XLSX file.    {csv,xlsx}
-                                Otherwise defaults to xlsx.
+        -fmt,   --format        Set export format. Will require                 {xlsx,csv,ods,dict,xml,json}
+                                appropiate modules in Python.
+                                ods - PyODF
+                                xlsx - OpenPyXL
+                                xml - lxml     
+                                Defaults to xlsx.
+        
+        -key    --keywords      Set keywords to replace numericals with         [string|path]
+                                alphanumerical characters
+                                Can be single word or
+                                list: 'written,like,this'
+                                Or path to a JSON file containing a dict
+
+                                Keywords only currently act upon folders
+                                and not files.
+        
+        -keym   -keywords-mode  Set way to replace:                             {initialise,first_letters,from_json}
+                                initialise: My New Folder > MNF
+                                first_letters: My New Folder > MYF
+                                from_json: Imports
+                                Requires to have a Json file with a
+                                dictionary of words to replace:
+                                {'Word':'Replacement',
+                                'SecondWord':'2ndReplacement}
+        
+        --keywords-retain-      Set whether to continue reference numbering     [bool]
+        order                   If not used keywords don't 'count' towards
+                                additional references. 
+                                IE if the keyword you are replacing is 
+                                be reference number: 2, this is moved
+                                to what would originally be number 3.
+                                Retaining the order means, this scheme is 
+                                maintined: IE 3 is still 3, and 2 is skipped
+
+        --keywords-case-        Set to enable case-sensisitivity for keyword    [bool]
+        sensisitivity           matches. Default is cases are not sensisitive.
+
+        --keywords-abbreviation Set the number of characters to abbreviate to   [int]
+        -number                 Only for first_letters mode.
+
+        --sort-by               Set the sorting method: folders_first, sorts    [folders_first|alphabetically]
+                                folders first. Alphabetically, you can guess.
+                                Ignores folders.
+                
+                                
+        
 ```
 
 ## Future Developments
 
-- Level Limitations to allow for "group references".
-- Generating reference's which use alphabetic characters...
+- ~~Level Limitations to allow for "group references"~~ - Added!
+- ~~Generating reference's which use alphabetic characters~~ - Added!
 
 ## Contributing
 
