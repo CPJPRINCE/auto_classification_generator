@@ -1,5 +1,5 @@
 """
-Common Tools used in both Opex Manifest and Auto Classification modules. Exporting to Excel, CSV.
+Common Tools used in both Opex Manifest and Auto Reference modules.
 
 author: Christopher Prince
 license: Apache License 2.0"
@@ -9,6 +9,7 @@ import os, time, sys, stat
 import datetime
 import pandas as pd
 from typing import Optional
+from auto_classification_generator.classification_generator import METAFOLDER
 
 def path_check(path: str):
     if os.path.exists(path):
@@ -16,14 +17,20 @@ def path_check(path: str):
     else:
         os.makedirs(path)
 
-def define_output_file(output_path: str, output_name: str, meta_dir_flag: Optional[bool] = True, output_suffix: str = "_AutoClass", output_format: str = "xlsx"):
+def define_output_file(output_path: str, output_name: str, meta_dir_flag: Optional[bool] = True, output_suffix: None|str = None, output_format: str = "xlsx"):
     path_check(output_path)
     if meta_dir_flag:
-        path_check(os.path.join(output_path,"meta"))
-        output_dir = os.path.join(output_path,"meta",str(os.path.basename(output_name)) + output_suffix + "." + output_format)
+        path_check(os.path.join(output_path,METAFOLDER))
+        if output_suffix is None:
+            output_file = os.path.join(output_path,METAFOLDER,str(os.path.basename(output_name)) + "." + output_format)
+        else:
+            output_file = os.path.join(output_path,METAFOLDER,str(os.path.basename(output_name)) + output_suffix + "." + output_format)
     else:
-        output_dir = os.path.join(output_path,str(os.path.basename(output_name)) + output_suffix + "." + output_format)
-    return output_dir
+        if output_suffix is None:
+            output_file = os.path.join(output_path,str(os.path.basename(output_name)) + "." + output_format)
+        else:
+            output_file = os.path.join(output_path,str(os.path.basename(output_name)) + output_suffix + "." + output_format)
+    return output_file
 
 def export_list_txt(txt_list: list, output_filename: str):
     try: 

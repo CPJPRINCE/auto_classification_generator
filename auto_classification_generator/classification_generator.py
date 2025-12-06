@@ -145,7 +145,14 @@ class ClassificationGenerator():
         MODDATE_FIELD = config['options']['MODDATE_FIELD']        
         global ACCESSDATE_FIELD
         ACCESSDATE_FIELD = config['options']['ACCESSDATE_FIELD']
-
+        global OUTPUTSUFFIX
+        OUTPUTSUFFIX = config['options']['SPREADSHEET_NAME']
+        global METAFOLDER
+        METAFOLDER = config['options']['METAFOLDER']
+        global EMPTYDIRSREMOVED
+        EMPTYDIRSREMOVED = config['options']['EMPTYDIRSREMOVED']
+        global ACCDELIMTER
+        ACCDELIMTER = config['options']['ACCDELIMTER']
 
     def remove_empty_directories(self) -> None:
         """
@@ -172,7 +179,7 @@ class ClassificationGenerator():
                     print(f"Error removing directory '{dirpath}': {e}")
         if empty_dirs:
             output_txt = define_output_file(self.output_path, self.root, self.meta_dir_flag, 
-                                            output_suffix = "_EmptyDirectoriesRemoved", output_format = "txt")
+                                            output_suffix = EMPTYDIRSREMOVED, output_format = "txt")
             export_list_txt(empty_dirs, output_txt)
         else:
             print('No directories removed!')
@@ -186,12 +193,12 @@ class ClassificationGenerator():
                 list_directories = sorted([win_256_check(os.path.join(directory, f.name)) for f in os.scandir(directory)
                                         if not f.name.startswith('.')
                                         and filter_win_hidden(win_256_check(os.path.join(directory, f.name))) is False
-                                        and f.name != 'meta'
+                                        and f.name != METAFOLDER
                                         and f.name != os.path.basename(__file__)],
                                         key = sort_key)
             elif self.hidden_flag is True:
                 list_directories = sorted([os.path.join(directory, f.name) for f in os.scandir(directory) \
-                                        if f.name != 'meta' \
+                                        if f.name != METAFOLDER \
                                         and f.name != os.path.basename(__file__)],
                                         key = sort_key)
             else:
@@ -213,7 +220,7 @@ class ClassificationGenerator():
             file_stats = os.stat(file_path)
             if self.accession_flag is not None:
                 if self.delimiter_flag is False:
-                    self.delimiter = "-"
+                    self.delimiter = ACCDELIMTER
                 acc_ref = self.accession_running_number(parse_path, self.delimiter)
                 self.accession_list.append(acc_ref)
             if os.path.isdir(file_path):
@@ -498,7 +505,7 @@ class ClassificationGenerator():
             self.remove_empty_directories()
         self.init_dataframe()
         output_file = define_output_file(self.output_path, self.root, meta_dir_flag = self.meta_dir_flag, 
-                                         output_format = self.output_format)
+                                         output_suffix = OUTPUTSUFFIX ,output_format = self.output_format)
         if self.output_format == "xlsx":
             export_xl(df = self.df, output_filename = output_file)
         elif self.output_format == "csv":
