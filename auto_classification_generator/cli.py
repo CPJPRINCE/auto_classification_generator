@@ -3,45 +3,51 @@ import argparse, os
 import importlib.metadata
 
 def parse_args():
-    parser = argparse.ArgumentParser(description = "Auto Classification Generator for Digital Cataloguing")
+    parser = argparse.ArgumentParser(prog="Auto_Classification_Generator", description = "Auto Classification Generator for Digital Cataloguing")
     parser.add_argument('root', nargs = '?', default = os.getcwd(),
                         help = "The root directory to create references for")
     parser.add_argument("-p", "--prefix", required = False, nargs = '?',
                         help = "Set a prefix to append onto generated references")
+    parser.add_argument("-s", "--suffix", required = False, nargs = '?',
+                        help = "Set a suffix to append onto generated references")
+    parser.add_argument("--suffix-options", required = False, choices= ['apply_to_files','apply_to_folders','apply_to_both'], default = 'apply_to_files',
+                        help = "Set a suffix to append onto generated references")
     parser.add_argument("--rm-empty", required = False, action = 'store_true',
                         help = "Sets the Program to remove any Empty Directory and Log removals to a text file")
-    parser.add_argument("-acc", "--accession", required = False, choices = ['none', 'dir', 'file', 'all'], default = None, type = str.lower,
+    parser.add_argument("-acc", "--accession", required = False, choices = ['dir', 'file', 'all'], default = None, type = str.lower,
                         help="Sets the program to create an accession listing - IE a running number of the files.")
     parser.add_argument("-accp", "--acc-prefix", required = False, nargs = '?',
                         help = "Sets the Prefix for Accession Mode")
     parser.add_argument("-o", "--output", required = False, nargs = '?',
                         help = "Set the output directory for created spreadsheet")
-    parser.add_argument("-s", "--start-ref", required = False, nargs = '?', default = 1,
+    parser.add_argument("-str", "--start-ref", required = False, nargs = '?', default = 1,
                         help = "Set the starting reference number. Won't affect sub-folders/files")
-    parser.add_argument("-dlm", "--delimiter", required = False, nargs= '?',type = str,
+    parser.add_argument("-dlm", "--delimiter", required = False, nargs= '?', type = str,
                         help = "Set the delimiter to use between levels")
-    parser.add_argument("--disable-meta-dir", required = False, action = 'store_true', default = True,
+    parser.add_argument("--disable-meta-dir", required = False, action = 'store_false', default = True,
                         help = "Set to disable creating a 'meta' file for spreadsheet; can be used in combination with output")
-    parser.add_argument("--skip", required = False, action = 'store_true', default = False,
+    parser.add_argument("-skp","--skip", required = False, action = 'store_true', default = False,
                         help = "Set to skip creating references, will generate a spreadsheet listing")
-    parser.add_argument("--hidden", required = False , action = 'store_true', default = False,
+    parser.add_argument("-hid","--hidden", required = False , action = 'store_true', default = False,
                         help = "Set to include hidden files/folders in the listing")
     parser.add_argument("-fmt", "--output-format", required = False, default = "xlsx", choices = ['xlsx', 'csv', 'json', 'ods', 'xml', 'dict'],
-                        help = "Set to set output format. Note ods requires odfpy; xml requires lxml")
-    parser.add_argument("-fx", "--fixity", required = False, nargs = '?', const = "SHA-1", default = None, choices = ['NONE', 'MD5', 'SHA-1', 'SHA-256', 'SHA-512'], type = str.upper,
-                        help = "Set to generate fixtites, specify Algorithm to use")
+                        help = "Set to set output format. Note ods requires odfpy; xml requires lxml; dict requires pandas, please install via pip if needed")
+    parser.add_argument("-fx", "--fixity", required = False, nargs = '?', const = "SHA-1", default = None, choices = ['MD5', 'SHA-1', 'SHA1', 'SHA-256','SHA256','SHA-512','SHA512'], type = str.upper,
+                        help = "Set to generate fixities, specify Algorithm to use (default SHA-1)")
     parser.add_argument("-v", "--version", action = 'version', version = '%(prog)s {version}'.format(version = importlib.metadata.version("auto_classification_generator")),
-                        help = "See version information")
+                        help = "See version information, then exit")
     parser.add_argument("-key","--keywords", nargs = '*', default = None,
-                        help = "Set to replace reference numbers with given Keywords - Must be exact matches, case sensistive")
-    parser.add_argument("-keym","--keywords-mode", nargs = '?', const = "intialise", choices = ['intialise','firstletters'], default = 'intialise',
-                        help = "Set to alternate keyword mode: 'intialise' will use intials of words; 'firstletters' will use the first letters of the string")
+                        help = "Set to replace reference numbers with given Keywords for folders (only Folders atm). Can be a list of keywords or a JSON file mapping folder names to keywords.")
+    parser.add_argument("--keywords-case-sensitivity", required = False, action = 'store_false', default = True,
+                        help = "Set to change case keyword matching sensitivity. By default keyword matching is insensitive")
+    parser.add_argument("-keym","--keywords-mode", nargs = '?', const = "initialise", choices = ['initialise','firstletters','from_json'], default = 'initialise',
+                        help = "Set to alternate keyword mode: 'initialise' will use initials of words; 'firstletters' will use the first letters of the string; 'from_json' will use a JSON file mapping names to keywords")
     parser.add_argument("--keywords-retain-order", required = False, default = False, action = 'store_true', 
-                        help = "Set when using keywords to continue reference numbering. If not used keywords don't 'count' to reference numbering")
+                        help = "Set when using keywords to continue reference numbering. If not used keywords don't 'count' to reference numbering, e.g. if using initials 'Project Alpha' -> 'PA' then the next folder/file will still be '001' not '003'")
     parser.add_argument("--keywords-abbreviation-number", required = False, nargs='+', default = None, type = int,
-                        help = "Set to set the number of letters to abbreviate for 'firstletters' mode, does not impact 'intialise' [currently]")
-    parser.add_argument("--sort-by", required=False, nargs = '?', default = 'foldersfirst', choices = ['foldersfirst','alphabetical'], type=str.lower,
-                        help = "Set the sorting method, 'foldersfirst' sorts folders first then files alphabetically; 'alphabetically' sorts alphabetically (ignoring folder distinction)")
+                        help = "Set to set the number of letters to abbreviate for 'firstletters' mode, does not impact 'initialise' mode.")
+    parser.add_argument("--sort-by", required=False, nargs = '?', default = 'folders_first', choices = ['folders_first','alphabetical'], type=str.lower,
+                        help = "Set the sorting method, 'folders_first' sorts folders first then files alphabetically; 'alphabetically' sorts alphabetically (ignoring folder distinction)")
     args = parser.parse_args()
     return args
 
@@ -55,8 +61,11 @@ def run_cli():
     else:
         args.output = os.path.abspath(args.output)
         print(f'Output path set to: {args.output}')
+    if args.acc_prefix and not args.accession:
+        print(f'Accession Prefix set but Accession Mode not set, ignoring Accession Prefix')
+    sort_key = None
     if args.sort_by:
-        if args.sort_by == "foldersfirst":
+        if args.sort_by == "folders_first":
             sort_key = lambda x: (os.path.isfile(x), str.casefold(x))
         elif args.sort_by == "alphabetical":
             sort_key = str.casefold
@@ -64,7 +73,9 @@ def run_cli():
     ClassificationGenerator(args.root, 
                             output_path = args.output, 
                             prefix = args.prefix, 
-                            accprefix = args.acc_prefix, 
+                            accprefix = args.acc_prefix,
+                            suffix = args.suffix,
+                            suffix_options = args.suffix_options,
                             fixity = args.fixity, 
                             empty_flag = args.rm_empty, 
                             accession_flag = args.accession, 
@@ -76,6 +87,7 @@ def run_cli():
                             keywords = args.keywords,
                             keywords_mode = args.keywords_mode,
                             keywords_retain_order = args.keywords_retain_order,
+                            keywords_case_sensitivity= args.keywords_case_sensitivity,
                             sort_key = sort_key,
                             delimiter = args.delimiter,
                             keywords_abbreviation_number = args.keywords_abbreviation_number).main()
