@@ -47,6 +47,7 @@ class ClassificationGenerator():
                  prefix: Optional[str] = None,
                  suffix: Optional[str] = None,
                  suffix_options: str = 'apply_to_files',
+                 level_limit: Optional[int] = None,
                  accprefix: Optional[str] = None, 
                  start_ref: int = 1, 
                  fixity: Optional[str] = None, 
@@ -74,6 +75,7 @@ class ClassificationGenerator():
         self.prefix = prefix
         self.suffix = suffix
         self.suffix_options = suffix_options
+        self.level_limit = level_limit
         self.start_ref = start_ref
         self.fixity = fixity
         self.delimiter = delimiter
@@ -308,7 +310,10 @@ class ClassificationGenerator():
                         ref = str(ref) + str(self.suffix)
                     else:
                         pass
-                self.parse_directory_dict(file_path, level, ref)
+                if self.level_limit is not None and level > self.level_limit:
+                    self.parse_directory_dict(file_path, level, ref='')
+                else:
+                    self.parse_directory_dict(file_path, level, ref)
                 #Suffix Removal for next reference increment
                 if self.suffix is not None:
                     if self.suffix_options == 'apply_to_files' and os.path.isfile(file_path):
@@ -414,7 +419,7 @@ class ClassificationGenerator():
                         new_ref = str(self.prefix) + delimiter + str(new_ref)
                 self.reference_list.append(new_ref)
             else:
-                parent_ref = self.df['Ref_Section'].loc[idx].item()
+                parent_ref = self.df[REF_SECTION].loc[idx].item()
                 if parent_ref == 0:
                     if track == 1:
                         new_ref = str(ref)
@@ -422,10 +427,16 @@ class ClassificationGenerator():
                         new_ref = str(new_ref)
                 else:
                     if track == 1:
-                        new_ref = str(parent_ref) + delimiter + str(ref)
+                        if ref == '':
+                            new_ref = str(parent_ref)
+                        else:
+                            new_ref = str(parent_ref) + delimiter + str(ref)
                     else:
-                        new_ref = str(parent_ref) + delimiter + str(new_ref)
-                parent = self.df['Parent'].loc[idx].item()
+                        if ref == '' and parent_ref == '':
+                            pass
+                        else:
+                            new_ref = str(parent_ref) + delimiter + str(new_ref)
+                parent = self.df[PARENT_FIELD].loc[idx].item()
                 track = track + 1
                 self.reference_loop(ref, parent, track, level, new_ref, delimiter=delimiter)
 

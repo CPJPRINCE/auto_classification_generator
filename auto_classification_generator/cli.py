@@ -20,7 +20,9 @@ def parse_args():
                         help = "Sets the Prefix for Accession Mode")
     parser.add_argument("-o", "--output", required = False, nargs = '?',
                         help = "Set the output directory for created spreadsheet")
-    parser.add_argument("-str", "--start-ref", required = False, nargs = '?', default = 1,
+    parser.add_argument("-l", "--level-limit", required = False, nargs = '?', type = int,
+                        help = "Set a level limit to generate references to")
+    parser.add_argument("-str", "--start-ref", required = False, nargs = '?', default = 1, type=int,
                         help = "Set the starting reference number. Won't affect sub-folders/files")
     parser.add_argument("-dlm", "--delimiter", required = False, nargs= '?', type = str,
                         help = "Set the delimiter to use between levels")
@@ -76,6 +78,7 @@ def run_cli():
                             accprefix = args.acc_prefix,
                             suffix = args.suffix,
                             suffix_options = args.suffix_options,
+                            level_limit = args.level_limit,
                             fixity = args.fixity, 
                             empty_flag = args.rm_empty, 
                             accession_flag = args.accession, 
