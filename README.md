@@ -172,6 +172,11 @@ Options:
                                 folders,or to all                               apply_to_all}
                                 default is to apply_to_files.
         
+        -l      --level-limit   Set whether to limit generation to              [int]
+                                a specific level.
+                                Note generated references may have
+                                extra delimiter.
+
         -dlm    --delimiter     Set to change the default delimiter             [string]
 
         -acc,   --accession     Run in "Accession Mode", this will              {Dir,File,
