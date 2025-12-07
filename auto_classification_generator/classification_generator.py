@@ -178,7 +178,7 @@ class ClassificationGenerator():
                 except OSError as e:
                     print(f"Error removing directory '{dirpath}': {e}")
         if empty_dirs:
-            output_txt = define_output_file(self.output_path, self.root, self.meta_dir_flag, 
+            output_txt = define_output_file(self.output_path, self.root, METAFOLDER, self.meta_dir_flag, 
                                             output_suffix = EMPTYDIRSREMOVED, output_format = "txt")
             export_list_txt(empty_dirs, output_txt)
         else:
