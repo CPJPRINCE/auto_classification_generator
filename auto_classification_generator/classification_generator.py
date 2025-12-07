@@ -64,7 +64,7 @@ class ClassificationGenerator():
                  keywords_case_sensitivity: Optional[bool] = True,
                  sort_key = lambda x: (os.path.isfile(x), str.casefold(x)),
                  keywords_abbreviation_number: Optional[int] = None,
-                 options_file: str = os.path.join(os.path.dirname(__file__),'options.properties')
+                 options_file: str = os.path.join(os.path.dirname(__file__),'options','options.properties')
                  ) -> None:
 
         self.root = os.path.abspath(root)
@@ -110,7 +110,7 @@ class ClassificationGenerator():
         self.parse_config(options_file=os.path.abspath(options_file))
         self.start_time = datetime.datetime.now()
 
-    def parse_config(self, options_file = 'options.properties') -> None:
+    def parse_config(self, options_file = os.path.join('options','options.properties')) -> None:
         config = configparser.ConfigParser()
         config.read(options_file, encoding='utf-8')
         global INDEX_FIELD
@@ -146,11 +146,11 @@ class ClassificationGenerator():
         global ACCESSDATE_FIELD
         ACCESSDATE_FIELD = config['options']['ACCESSDATE_FIELD']
         global OUTPUTSUFFIX
-        OUTPUTSUFFIX = config['options']['SPREADSHEET_NAME']
+        OUTPUTSUFFIX = config['options']['OUTPUTSUFFIX']
         global METAFOLDER
         METAFOLDER = config['options']['METAFOLDER']
         global EMPTYDIRSREMOVED
-        EMPTYDIRSREMOVED = config['options']['EMPTYDIRSREMOVED']
+        EMPTYDIRSREMOVED = config['options']['EMPTYSUFFIX']
         global ACCDELIMTER
         ACCDELIMTER = config['options']['ACCDELIMTER']
 

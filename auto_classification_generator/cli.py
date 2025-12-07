@@ -50,6 +50,8 @@ def parse_args():
                         help = "Set to set the number of letters to abbreviate for 'firstletters' mode, does not impact 'initialise' mode.")
     parser.add_argument("--sort-by", required=False, nargs = '?', default = 'folders_first', choices = ['folders_first','alphabetical'], type=str.lower,
                         help = "Set the sorting method, 'folders_first' sorts folders first then files alphabetically; 'alphabetically' sorts alphabetically (ignoring folder distinction)")
+    parser.add_argument("--options-file", required = False, nargs = '?', default = os.path.join(os.path.dirname(__file__),'options','options.properties'),
+                        help = "Set the options file to use")
     args = parser.parse_args()
     return args
 
@@ -93,7 +95,8 @@ def run_cli():
                             keywords_case_sensitivity= args.keywords_case_sensitivity,
                             sort_key = sort_key,
                             delimiter = args.delimiter,
-                            keywords_abbreviation_number = args.keywords_abbreviation_number).main()
+                            keywords_abbreviation_number = args.keywords_abbreviation_number,
+                            options_file = args.options_file).main()
     print('Complete!')
 
 if __name__ == "__main__":
