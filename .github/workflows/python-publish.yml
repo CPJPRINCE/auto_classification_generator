@@ -1,24 +1,10 @@
-# This workflow will upload a Python Package to PyPI when a release is created
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-python#publishing-to-package-registries
-
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
-name: Publish Distribution to PyPi and TestPyPI
+name: Publish Python distribution to PyPI
 
 on: push
 
-#  release:
-#    types: [published]
-
-permissions:
-  contents: read
-
 jobs:
   build:
-    name: Build distibution
+    name: Build distribution
     runs-on: ubuntu-latest
 
     steps:
@@ -26,16 +12,14 @@ jobs:
       with:
         persist-credentials: false
     - name: Set up Python
-    - uses: actions/setup-python@v6
+      uses: actions/setup-python@v6
       with:
         python-version: "3.x"
-
-    - name: Build release distributions
+    - name: Install pypa/build
       run: >-
-        # NOTE: put your own distribution build steps here.
-        python -m pip install build
-        python -m build
-          
+        python3 -m
+        pip install
+        build
     - name: Build a binary wheel and a source tarball
       run: python3 -m build
     - name: Store the distribution packages
@@ -45,31 +29,23 @@ jobs:
         path: dist/
 
   publish-to-pypi:
-    if: startsWith(github.ref, 'refs/tags/') #only publish on Tag Pushes
+    name: >-
+      Publish Python distribution to PyPI
+    if: startsWith(github.ref, 'refs/tags/')  # only publish to PyPI on tag pushes
     needs:
-      - build
-    runs-on: ubuntu-latest  
-    permissions:
-      id-token: write      # IMPORTANT: this permission is mandatory for trusted publishing
+    - build
+    runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/project/auto-classification-generator
-    # Dedicated environments with protections for publishing are strongly recommended.
-    # For more information, see: https://docs.github.com/en/actions/deployment/targeting-different-environments/using-environments-for-deployment#deployment-protection-rules
-      # OPTIONAL: uncomment and update to include your PyPI project URL in the deployment status:
-    
-      # ALTERNATIVE: if your GitHub Release name is the PyPI project version string
-      # ALTERNATIVE: exactly, uncomment the following line instead:
-      # url: https://pypi.org/project/YOURPROJECT/${{ github.event.release.name }}
+      url: https://pypi.org/p/auto_classification_generator  # Replace <package-name> with your PyPI project name
+    permissions:
+      id-token: write  # IMPORTANT: mandatory for trusted publishing
 
     steps:
-      - name: Retrieve release distributions
-        uses: actions/download-artifact@v6
-        with:
-          name: python-package-distributions
-          path: dist/
-
-      - name: Publish release distributions to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          packages-dir: dist/
+    - name: Download all the dists
+      uses: actions/download-artifact@v6
+      with:
+        name: python-package-distributions
+        path: dist/
+    - name: Publish distribution to PyPI
+      uses: pypa/gh-action-pypi-publish@release/v1
