@@ -22,7 +22,7 @@ class ClassificationGenerator():
     Will turn the hierarchy of a folder into and return the results as spreadsheet (or other output).
 
     :param root: the root directory to generate references for. Subsequent directories and files will be included.
-    :param output_path: set the output path
+    :param output_path: set the output path for the generated spreadsheet.
     :param prefix: set a prefix to append to generated references
     :param accprefix: set a prefix to append to generated accession references
     :param suffix: set a suffix to append to generated references
