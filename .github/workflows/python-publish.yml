@@ -6,22 +6,25 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Upload Python Package
+name: Publish Distribution to PyPi and TestPyPI
 
-on:
-  release:
-    types: [published]
+on: push
+
+#  release:
+#    types: [published]
 
 permissions:
   contents: read
 
 jobs:
-  release-build:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
-
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Set up Python
       - uses: actions/setup-python@v5
         with:
           python-version: "3.x"
@@ -35,13 +38,14 @@ jobs:
       - name: Upload distributions
         uses: actions/upload-artifact@v4
         with:
-          name: release-dists
+          name: python-package-distributions
           path: dist/
 
-  pypi-publish:
-    runs-on: ubuntu-latest
+  publish-to-pypi:
+    if: startsWith(github.ref, 'refs/tags/') #only publish on Tag Pushes
     needs:
-      - release-build
+      - build
+    runs-on: ubuntu-latest  
     permissions:
       # IMPORTANT: this permission is mandatory for trusted publishing
       id-token: write
@@ -59,9 +63,9 @@ jobs:
 
     steps:
       - name: Retrieve release distributions
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v6
         with:
-          name: release-dists
+          name: python-package-distributions
           path: dist/
 
       - name: Publish release distributions to PyPI
