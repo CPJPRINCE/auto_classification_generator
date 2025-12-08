@@ -21,7 +21,7 @@ class ClassificationGenerator():
     A Tool for generating archival references for any given directory for use by Digital Archivists.
     Will turn the hierarchy of a folder into and return the results as spreadsheet (or other output).
 
-    :param root: the directory to generate references for
+    :param root: the root directory to generate references for. Subsequent directories and files will be included.
     :param output_path: set the output path
     :param prefix: set a prefix to append to generated references
     :param accprefix: set a prefix to append to generated accession references
