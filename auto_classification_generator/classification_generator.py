@@ -25,6 +25,8 @@ class ClassificationGenerator():
     :param output_path: set the output path
     :param prefix: set a prefix to append to generated references
     :param accprefix: set a prefix to append to generated accession references
+    :param suffix: set a suffix to append to generated references
+    :param suffix_options: set whether to apply the suffix to files, folders or both
     :param start_ref: set the starting reference, only affects first instance
     :param fixity: set whether to generate fixities
     :param empty_flag: set whether to delete and log empty directories
@@ -39,6 +41,7 @@ class ClassificationGenerator():
     :param keywords_retain_order: set to continue counting reference, if keyword is used, skips numbers if not
     :param sort_key: set the sort key, can be any valid function for sorted
     :param keywords_abbreviation: set int for number of characters to abbreviate to for keywords mode
+    :param keywords_case_sensitivity: set to change case sensitivity for keyword matching
     :param options_file: set an options file to adjust field parameters
     """
     def __init__(self, 
@@ -46,7 +49,7 @@ class ClassificationGenerator():
                  output_path: str = os.getcwd(), 
                  prefix: Optional[str] = None,
                  suffix: Optional[str] = None,
-                 suffix_options: str = 'apply_to_files',
+                 suffix_options: Optional[str] = 'apply_to_files',
                  level_limit: Optional[int] = None,
                  accprefix: Optional[str] = None, 
                  start_ref: int = 1, 
@@ -107,6 +110,8 @@ class ClassificationGenerator():
         self.skip_flag = skip_flag
         self.hidden_flag = hidden_flag
 
+        if options_file is None:
+            options_file = os.path.join(os.path.dirname(__file__),'options','options.properties')
         self.parse_config(options_file=os.path.abspath(options_file))
         self.start_time = datetime.datetime.now()
 

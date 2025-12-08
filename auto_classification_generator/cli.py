@@ -10,8 +10,8 @@ def parse_args():
                         help = "Set a prefix to append onto generated references")
     parser.add_argument("-s", "--suffix", required = False, nargs = '?',
                         help = "Set a suffix to append onto generated references")
-    parser.add_argument("--suffix-options", required = False, choices= ['apply_to_files','apply_to_folders','apply_to_both'], default = 'apply_to_files',
-                        help = "Set a suffix to append onto generated references")
+    parser.add_argument("--suffix-option", required = False, choices= ['apply_to_files','apply_to_folders','apply_to_both'], default = 'apply_to_files',
+                        help = "Set whether to apply the suffix to files, folders or both when generating references")
     parser.add_argument("--rm-empty", required = False, action = 'store_true',
                         help = "Sets the Program to remove any Empty Directory and Log removals to a text file")
     parser.add_argument("-acc", "--accession", required = False, choices = ['dir', 'file', 'all'], default = None, type = str.lower,
@@ -79,7 +79,7 @@ def run_cli():
                             prefix = args.prefix, 
                             accprefix = args.acc_prefix,
                             suffix = args.suffix,
-                            suffix_options = args.suffix_options,
+                            suffix_options = args.suffix_option,
                             level_limit = args.level_limit,
                             fixity = args.fixity, 
                             empty_flag = args.rm_empty, 

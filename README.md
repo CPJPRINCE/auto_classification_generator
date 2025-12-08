@@ -59,6 +59,10 @@ The following modules are utilized and installed with the package:
 - pandas
 - openpyxl
 
+Optional Modules also include:
+- lxml (for XML Export)
+- odfpy (for ODS Export)
+
 Python Version 3.8+ is also recommended. It may work on earlier versions, but this has not been tested.
 
 ## Installation
@@ -95,7 +99,7 @@ Within the spreadsheet you will have information on the paths of the files as we
 
 ![SpreadPreview](assets/SpreadPreview.png)
 
-At the end of the spreadsheet an `Archive_Reference` column with the generated refrence. 
+At the end of the spreadsheet an `Archive_Reference` column with the generated reference. 
 
 ![ReferencePreview](assets/ReferencesPreview.png)
 
@@ -103,7 +107,7 @@ At the end of the spreadsheet an `Archive_Reference` column with the generated r
 
 ## Accession mode
 
-There is an alternative method of generating a reference number; having create a code based on the directory hierachy you can simply create one that follows an 'accession number' pattern. IE each file or folder regardless of depth will be given a running number; depending on the 'mode' the running number will only apply to Directories, Files or Both!
+There is an alternative method of generating a reference number; having create a code based on the directory hierarchy you can simply create one that follows an 'accession number' pattern. IE each file or folder regardless of depth will be given a running number; depending on the 'mode' the running number will only apply to Directories, Files or Both!
 
 
 ```
@@ -153,7 +157,7 @@ By default hidden folders and folders named 'meta' will be ignored. You can incl
 
 ## Skip
 
-If you just want to generate a spreadsheet without a reference code you can add `-skp | --skip`, and it will gsimply generate a spreadsheet without the Archive_Reference
+If you just want to generate a spreadsheet without a reference code you can add `-skp | --skip`, and it will simply generate a spreadsheet without the Archive_Reference
 
 ## Options:
 
@@ -213,7 +217,7 @@ Options:
                                 an Archival Reference
         
         -fmt,   --format        Set export format. Will require                 {xlsx,csv,ods,dict,xml,json}
-                                appropiate modules in Python.
+                                appropriate modules in Python.
                                 ods - PyODF
                                 xlsx - OpenPyXL
                                 xml - lxml     
@@ -244,10 +248,10 @@ Options:
                                 be reference number: 2, this is moved
                                 to what would originally be number 3.
                                 Retaining the order means, this scheme is 
-                                maintined: IE 3 is still 3, and 2 is skipped
+                                maintained: IE 3 is still 3, and 2 is skipped
 
-        --keywords-case-        Set to enable case-sensisitivity for keyword    [bool]
-        sensisitivity           matches. Default is cases are not sensisitive.
+        --keywords-case-        Set to enable case-sensitivity for keyword    [bool]
+        sensitivity           matches. Default is cases are not sensitive.
 
         --keywords-abbreviation Set the number of characters to abbreviate to   [int]
         -number                 Only for first_letters mode.
