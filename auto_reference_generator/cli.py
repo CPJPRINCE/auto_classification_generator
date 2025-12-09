@@ -1,9 +1,9 @@
-from auto_classification_generator.classification_generator import ClassificationGenerator
+from auto_reference_generator.reference_generator import ReferenceGenerator
 import argparse, os
 import importlib.metadata
 
 def parse_args():
-    parser = argparse.ArgumentParser(prog="Auto_Classification_Generator", description = "Auto Classification Generator for Digital Cataloguing")
+    parser = argparse.ArgumentParser(prog="Auto_Reference_Generator", description = "Auto Reference Generator for Digital Cataloguing")
     parser.add_argument('root', nargs = '?', default = os.getcwd(),
                         help = "The root directory to create references for")
     parser.add_argument("-p", "--prefix", required = False, nargs = '?',
@@ -36,7 +36,7 @@ def parse_args():
                         help = "Set to set output format. Note ods requires odfpy; xml requires lxml; dict requires pandas, please install via pip if needed")
     parser.add_argument("-fx", "--fixity", required = False, nargs = '?', const = "SHA-1", default = None, choices = ['MD5', 'SHA-1', 'SHA1', 'SHA-256','SHA256','SHA-512','SHA512'], type = str.upper,
                         help = "Set to generate fixities, specify Algorithm to use (default SHA-1)")
-    parser.add_argument("-v", "--version", action = 'version', version = '%(prog)s {version}'.format(version = importlib.metadata.version("auto_classification_generator")),
+    parser.add_argument("-v", "--version", action = 'version', version = '%(prog)s {version}'.format(version = importlib.metadata.version("auto_reference_generator")),
                         help = "See version information, then exit")
     parser.add_argument("-key","--keywords", nargs = '*', default = None,
                         help = "Set to replace reference numbers with given Keywords for folders (only Folders atm). Can be a list of keywords or a JSON file mapping folder names to keywords.")
@@ -74,7 +74,7 @@ def run_cli():
         elif args.sort_by == "alphabetical":
             sort_key = str.casefold
 
-    ClassificationGenerator(args.root, 
+    ReferenceGenerator(args.root, 
                             output_path = args.output, 
                             prefix = args.prefix, 
                             accprefix = args.acc_prefix,

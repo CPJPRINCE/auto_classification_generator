@@ -1,12 +1,12 @@
-# Auto Classification Generator Tool
+# Auto Reference Generator Tool
 
-The Auto-classification tool is small python programme to help Digital archivists classify and catalogue Digital Items. It recursively acts through a given directory to create generating reference codes for each directory and file, then exporting the results to an Excel or CSV spreadsheet.
+The Auto Reference Generator tool is small python programme to help Digital archivists reference and catalogue Digital Items. It recursively acts through a given directory to create generating reference codes for each directory and file, then exporting the results to an Excel or CSV spreadsheet.
 
 It's platform independent tested functioning on Windows, MacOS and Linux. 
 
 ## Why use this tool?
 
-If you're an archivist dealing with Digital Records, this provides a means of undertaking a classification of numerous records at a time, saving a significant amount of time in assigning reference codes to individual records.
+If you're an archivist dealing with Digital Records, this provides a means of undertaking a referencing of a large amount of digital records at a time, saving a significant amount of time in assigning reference codes to individual records.
 
 The generated spreadsheet also serves as the basis for spreadsheet inputs for the Opex Manifest Generator tool [*\*Shameless Self promotion\**.](https://github.com/CPJPRINCE/opex_manifest_generator/)
 
@@ -69,29 +69,29 @@ Python Version 3.8+ is also recommended. It may work on earlier versions, but th
 
 To install, simply run:
 
-`pip install -U auto_classification_generator`
+`pip install -U auto_Reference_generator`
 
 ## Usage
 
 To run the basic program, run from the terminal:
 
-`auto_class {path/to/your/folder}`
+`auto_ref {path/to/your/folder}`
 
 Replacing the path with your folder. If a space is in the path enclose in quotations. On Windows this may look like:
 
-`auto_class "C:\Users\Christopher\Downloads\"`
+`auto_ref "C:\Users\Christopher\Downloads\"`
 
 Additional options can be appended before or after the root directory.
 
 To run the program with the Prefix option, add the `-p` option and type in your prefix:
 
-`auto_class "C:\Users\Christopher\Downloads\" -p "ARCH"`
+`auto_ref "C:\Users\Christopher\Downloads\" -p "ARCH"`
 
 This will generate a spreadsheet in a folder called 'meta' within the 'root' directory.
 
 ![MetaFolder](assets/metaFolder.png)
 
-The spreadsheet will be named after the 'root' folder and appended with "_AutoClass".
+The spreadsheet will be named after the 'root' folder and appended with "_Autoref".
 
 ![FolderSpread](assets/SpreadGen.png)
 
@@ -127,7 +127,7 @@ The available modes are `File, Dir, All`
 
 To run in accession mode, use the `-acc` and `-accp` options (A prefix must be set):
 
-`auto_class "C:\Users\Christopher\Downloads\" -acc File -accp "ACC"`
+`auto_ref "C:\Users\Christopher\Downloads\" -acc File -accp "ACC"`
 
 ![AccessionPReview](assets/AccessionPreview.png)
 
@@ -149,7 +149,7 @@ You can also generate Fixities by simply adding the `-fx` option. This will defa
 
 To run a SHA-512 generation:
 
-`auto_class "C:\Users\Christopher\Downloads\" -fx SHA-512`
+`auto_ref "C:\Users\Christopher\Downloads\" -fx SHA-512`
 
 ## Filtering
 
@@ -212,7 +212,7 @@ Options:
                                 Default behavior will be to create a directory,
                                 using this option will disable it.      
         
-        -skp    --skip          Skip running the Auto Classification process,   [boolean]
+        -skp    --skip          Skip running the Auto Reference process,   [boolean]
                                 will generate a spreadsheet but not
                                 an Archival Reference
         

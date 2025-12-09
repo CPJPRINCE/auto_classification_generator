@@ -1,7 +1,7 @@
 """
-Auto Classification Generator tool
+Auto Reference Generator tool
 
-This tool is utilised to recursively generator classification codes, following an ISAD(G) convention, for a given directory / folder to an Excel or CSV spreadsheet.
+This tool is utilised to recursively generator reference codes, following an ISAD(G) convention, for a given directory / folder to an Excel or CSV spreadsheet.
 
 It is compatible with Windows, MacOS and Linux Operating Systems.
 
@@ -9,14 +9,14 @@ author: Christopher Prince
 license: Apache License 2.0"
 """
 
-from auto_classification_generator.common import *
-from auto_classification_generator.hash import *
+from auto_reference_generator.common import *
+from auto_reference_generator.hash import *
 import os, time, datetime
 import pandas as pd
 import configparser
 from typing import Optional
 
-class ClassificationGenerator():
+class ReferenceGenerator():
     """
     A Tool for generating archival references for any given directory for use by Digital Archivists.
     Will turn the hierarchy of a folder into and return the results as spreadsheet (or other output).
@@ -390,7 +390,7 @@ class ClassificationGenerator():
         tot = len(self.list_loop)
         for ref, parent, level in self.list_loop:
             c += 1
-            print(f"Generating Auto Classification for: {c} / {tot}", end = "\r")
+            print(f"Generating Auto Reference for: {c} / {tot}", end = "\r")
             if self.delimiter_flag is False:
                 self.delimiter = "/"
             self.reference_loop(ref = ref, parent = parent, track = 1, level = level, delimiter = self.delimiter)

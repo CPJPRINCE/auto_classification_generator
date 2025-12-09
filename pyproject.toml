@@ -3,12 +3,12 @@ requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "auto_classification_generator"
-version = "1.3.2"
+name = "auto_reference_generator"
+version = "1.0.0"
 authors = [
     {name="Christopher Prince", email="c.pj.prince@gmail.com"}
     ]
-description = "Auto Classification Generator Tool for Archivists"
+description = "Auto Reference Generator Tool for Archivists"
 classifiers = [
     "Programming Language :: Python :: 3",
     "License :: OSI Approved :: Apache Software License",
@@ -17,12 +17,12 @@ classifiers = [
     ]
 dependencies=["pandas","openpyxl"]
 [project.urls]
-Homepage = "https://github.com/CPJPRINCE/auto_classification_generator"
-Issues = "https://github.com/CPJPRINCE/auto_classification_generator/issues"
+Homepage = "https://github.com/CPJPRINCE/auto_reference_generator"
+Issues = "https://github.com/CPJPRINCE/auto_reference_generator/issues"
 [project.scripts]
-auto_class = "auto_classification_generator.cli:run_cli"
+auto_ref = "auto_reference_generator.cli:run_cli"
 
 [tool.setuptools.packages.find]
 where = ['.']
-include = ['auto_classification_generator']
+include = ['auto_reference_generator']
 exclude = []
