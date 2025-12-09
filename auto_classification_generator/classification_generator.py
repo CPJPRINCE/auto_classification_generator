@@ -355,14 +355,25 @@ class ClassificationGenerator():
         """
         self.parse_directory_dict(file_path = self.root, level = 0, ref = 0)
         self.list_directories(self.root, self.start_ref)
-        self.df = pd.DataFrame(self.record_list)
-        self.df = self.df.merge(self.df[[INDEX_FIELD, REF_SECTION]], how = 'left', left_on = PARENT_FIELD, 
-                                right_on = INDEX_FIELD)
-        self.df = self.df.drop([f'{INDEX_FIELD}_y'], axis = 1)
-        self.df = self.df.rename(columns = {f'{REF_SECTION}_x': REF_SECTION, f'{REF_SECTION}_y': PARENT_REF, 
-                                          f'{INDEX_FIELD}_x': INDEX_FIELD})
-        self.df[PARENT_REF] = self.df[PARENT_REF].fillna(0)
-        self.df = self.df.astype({PARENT_REF: str})
+        self.df = pd.DataFrame(self.record_list).copy()
+        
+        merged = self.df.merge(self.df[[INDEX_FIELD, REF_SECTION]], how = 'left', left_on = PARENT_FIELD, 
+                                right_on = INDEX_FIELD, suffixes=('_x', '_y'))
+        parent_col = f'{REF_SECTION}_y'
+        parent_series = (pd.to_numeric(merged[parent_col], errors='coerce').fillna(0).astype(int).astype(str))
+
+        merged = merged.drop(columns=[f'{INDEX_FIELD}_y'])  
+        merged = merged.rename(columns={f'{REF_SECTION}_x': REF_SECTION, parent_col: PARENT_REF, f'{INDEX_FIELD}_x': INDEX_FIELD})
+        merged[PARENT_REF] = parent_series.astype(str)
+        self.df = merged
+        # old method - resulted in dtype warning
+        # self.df = self.df.merge(self.df[[INDEX_FIELD, REF_SECTION]], how = 'left', left_on = PARENT_FIELD, 
+        #                        right_on = INDEX_FIELD)
+        #self.df = self.df.drop([f'{INDEX_FIELD}_y'], axis = 1)
+        #self.df = self.df.rename(columns = {f'{REF_SECTION}_x': REF_SECTION, f'{REF_SECTION}_y': PARENT_REF, 
+        #                                  f'{INDEX_FIELD}_x': INDEX_FIELD})
+        #self.df.loc[:, PARENT_REF] = self.df[PARENT_REF].fillna(0)
+        #self.df.loc[:, PARENT_REF] = self.df.astype({PARENT_REF: str})
         self.df.index.name = "Index"
         self.list_loop = self.df[[REF_SECTION, PARENT_FIELD, LEVEL_FIELD]].values.tolist()
         if self.skip_flag:
@@ -384,9 +395,9 @@ class ClassificationGenerator():
                 self.delimiter = "/"
             self.reference_loop(ref = ref, parent = parent, track = 1, level = level, delimiter = self.delimiter)
 
-        self.df[REFERENCE_FIELD] = self.reference_list
+        self.df.loc[:, REFERENCE_FIELD] = self.reference_list
         if self.accession_flag is not None:
-            self.df[ACCESSION_FIELD] = self.accession_list
+            self.df.loc[:, ACCESSION_FIELD] = self.accession_list
         return self.df
 
     def reference_loop(self, ref: str, parent: str, track: int, level: int, new_ref: Optional[str] = None, delimiter: str = "/") -> None:
@@ -419,7 +430,7 @@ class ClassificationGenerator():
         16) As this is acting within the Loop from the init stage, this will operate on all files within a list.
         """
         try:
-            idx = self.df[INDEX_FIELD][self.df[INDEX_FIELD] == parent].index
+            idx = self.df.loc[self.df[INDEX_FIELD] == parent,INDEX_FIELD].index
             if idx.size == 0:
                 if level == 0:
                     new_ref = str(ref)
@@ -431,7 +442,7 @@ class ClassificationGenerator():
                         new_ref = str(self.prefix) + delimiter + str(new_ref)
                 self.reference_list.append(new_ref)
             else:
-                parent_ref = self.df[REF_SECTION].loc[idx].item()
+                parent_ref = self.df.loc[idx, REF_SECTION].item()
                 if parent_ref == 0:
                     if track == 1:
                         new_ref = str(ref)
@@ -448,7 +459,7 @@ class ClassificationGenerator():
                             pass
                         else:
                             new_ref = str(parent_ref) + delimiter + str(new_ref)
-                parent = self.df[PARENT_FIELD].loc[idx].item()
+                parent = self.df.loc[idx,PARENT_FIELD].item()
                 track = track + 1
                 self.reference_loop(ref, parent, track, level, new_ref, delimiter=delimiter)
 
