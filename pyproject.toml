@@ -8,10 +8,14 @@ version = "1.0.0"
 authors = [
     {name="Christopher Prince", email="c.pj.prince@gmail.com"}
     ]
-description = "Auto Reference Generator Tool for Archivists"
+description = "A tool for archivist's to automate the generation of references for digital files"
+readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICEN[CS]E*"]
+keywords = ["archiving","archives","digital archiving","references","automatic archival reference generator"]
+
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
     "Topic :: System :: Archiving"
     ]
@@ -25,14 +29,6 @@ Homepage = "https://github.com/CPJPRINCE/auto_reference_generator"
 Issues = "https://github.com/CPJPRINCE/auto_reference_generator/issues"
 [project.scripts]
 auto_ref = "auto_reference_generator.cli:run_cli"
-description = "A tool for Digital Archivist's to Automate the Generation of References for Digital files"
-readme = "README.md"
-license = "Apache-2.0"
-license-files = ["LICEN[CS]E*"]
-keywords = ["archiving","archives","digital archiving","references","automatic archival reference generator"]
-
-classifier = ["Development Status :: 5 - Production",
-"Progmramming Language :: Python :: 3"]
 
 [tool.setuptools.packages.find]
 where = ['.']
