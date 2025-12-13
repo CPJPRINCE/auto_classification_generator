@@ -1,6 +1,7 @@
 __pycache__
 dist/
 .venv
+.linuxvenv
 .vscode
 auto_reference_generator.egg-info/
 build/

@@ -285,7 +285,7 @@ class ReferenceGenerator():
                         elif self.keywords_retain_order is True:
                             pref = ref
                         ref = str(keyword_replace(keyword_file_name, mode=self.keywords_mode, abbreviation_number=self.keywords_abbreviation_number))
-                    elif any(keyword_file_name in keyword for keyword in self.keywords_list) and os.path.isdir(file_path):
+                    elif any(keyword_file_name in keyword.upper() for keyword in self.keywords_list) and os.path.isdir(file_path):
                         if self.keywords_retain_order is False:
                             pref = ref - 1
                         elif self.keywords_retain_order is True:
